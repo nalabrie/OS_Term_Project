@@ -6,7 +6,7 @@ using namespace std;
 
 int main() {
     // number of bytes to read
-    int nsize = 512;
+    int nsize = 400;
 
     // buffer for reading
     char buffer[nsize];
