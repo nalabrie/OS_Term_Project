@@ -1,13 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include "vdi.h"
 
 using namespace std;
 
 int main(int argc, char **argv) {
-
-
-
+    vdi file = vdi(argv[1]);
+    cout << file.filePath << endl;
+    cout << file.header << endl;
 
 
 
