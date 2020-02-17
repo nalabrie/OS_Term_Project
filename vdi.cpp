@@ -2,6 +2,8 @@
 // Implementation of the VDI file class
 //
 
+#include <iostream>
+#include <iomanip>
 #include "vdi.h"
 
 // default constructor, takes path to VDI file
@@ -47,4 +49,20 @@ void vdi::seek(std::ios::pos_type position) {
 void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
     // forward parameters to the builtin 'fstream' method
     VDI_file.seekg(offset, direction);
+}
+// prints the given buffer in both hexadecimal and characters
+void vdi::printBuffer(const char *buffer, int size) {
+    // loop through 'buffer' to print contents as hex
+    for (int i = 0; i < size; ++i) {
+        if (i % 16 == 0 && i != 0) {
+            // newline every 16 characters
+            std::cout << std::endl;
+        }
+
+        // convert current char to unsigned 8-bit int
+        uint8_t byte = buffer[i];
+
+        // print each hex in uppercase with 2 places of precision with a space afterward
+        std::cout << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) byte << " ";
+    }
 }

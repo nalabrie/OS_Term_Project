@@ -7,12 +7,10 @@ using namespace std;
 
 int main(int argc, char **argv) {
     vdi file = vdi(argv[1]);
-    cout << file.filePath << endl;
-    cout << file.header << endl;
+//    cout << file.filePath << endl;
+//    cout << file.header << endl;
 
-    char buffer[50];
-    file.read(buffer, 50);
-    cout << buffer << endl;
+    vdi::printBuffer(file.header, 48);
 
 
 

@@ -51,6 +51,9 @@ public:
 
     // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
     void seek(std::ios::off_type offset, std::ios_base::seekdir direction);
+
+    // prints the given buffer in both hexadecimal and characters
+    static void printBuffer(const char *buffer, int size);
 };
 
 
