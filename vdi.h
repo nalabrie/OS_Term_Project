@@ -13,7 +13,7 @@ private:
     /* VARIABLES */
 
     // the actual VDI file on the disk
-    std::ifstream VDI_file;
+    std::ifstream VDI_file;  // TODO: might need changed to fstream
 
     // header starting byte and size
     static const int HEADER_START = 0;
@@ -23,6 +23,7 @@ private:
 
     // sets the 'header' string
     void setHeader();
+
 public:
     /* VARIABLES */
 
