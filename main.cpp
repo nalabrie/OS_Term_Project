@@ -10,7 +10,9 @@ int main(int argc, char **argv) {
     cout << file.filePath << endl;
     cout << file.header << endl;
 
-
+    char buffer[50];
+    file.read(buffer, 50);
+    cout << buffer << endl;
 
 
 

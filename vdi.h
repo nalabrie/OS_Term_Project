@@ -13,7 +13,7 @@ private:
     /* VARIABLES */
 
     // the actual VDI file on the disk
-    std::ifstream VDI_file;  // TODO: might need changed to fstream
+    std::fstream VDI_file;
 
     // header starting byte and size
     static const int HEADER_START = 0;
@@ -39,6 +39,18 @@ public:
     vdi(const char *filePath);
 
     /* METHODS */
+
+    // read 'size' amount bytes from VDI into buffer (starting at cursor)
+    void read(char *buffer, std::streamsize size);
+
+    // write 'size' amount bytes from 'buffer' to VDI (starting at cursor)
+    void write(const char *buffer, std::streamsize size);
+
+    // sets the position of the file cursor to byte 'position'
+    void seek(std::ios::pos_type position);
+
+    // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
+    void seek(std::ios::off_type offset, std::ios_base::seekdir direction);
 };
 
 
