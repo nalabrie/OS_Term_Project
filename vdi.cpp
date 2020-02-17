@@ -50,12 +50,28 @@ void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
     // forward parameters to the builtin 'fstream' method
     VDI_file.seekg(offset, direction);
 }
+
 // prints the given buffer in both hexadecimal and characters
 void vdi::printBuffer(const char *buffer, int size) {
-    // loop through 'buffer' to print contents as hex
+    // loop through entire 'buffer'
     for (int i = 0; i < size; ++i) {
+        // condition is true every 16 loops
         if (i % 16 == 0 && i != 0) {
-            // newline every 16 characters
+            // move 4 spaces away from hex block
+            std::cout << "    ";
+
+            // loop through the previous 16 again
+            for (int j = i - 16; j < i; ++j) {
+                if (buffer[j] == '\n') {
+                    // print a space instead of a newline
+                    std::cout << " ";
+                } else {
+                    // print character normally
+                    std::cout << buffer[j];
+                }
+            }
+
+            // end line
             std::cout << std::endl;
         }
 
@@ -65,4 +81,23 @@ void vdi::printBuffer(const char *buffer, int size) {
         // print each hex in uppercase with 2 places of precision with a space afterward
         std::cout << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) byte << " ";
     }
+
+    // still need to print one more line of normal text
+
+    // move 4 spaces away from hex block
+    std::cout << "    ";
+
+    // loop through last 16
+    for (int i = size - 16; i < size; ++i) {
+        if (buffer[i] == '\n') {
+            // print a space instead of a newline
+            std::cout << " ";
+        } else {
+            // print character normally
+            std::cout << buffer[i];
+        }
+    }
+
+    // end line
+    std::cout << std::endl;
 }
