@@ -58,16 +58,16 @@ void vdi::printBuffer(const char *buffer, int size) {
         // condition is true every 16 loops
         if (i % 16 == 0 && i != 0) {
             // move 4 spaces away from hex block
-            std::cout << "    ";
+            std::cout << "   ";
 
             // loop through the previous 16 again
             for (int j = i - 16; j < i; ++j) {
-                if (buffer[j] == '\n') {
-                    // print a space instead of a newline
-                    std::cout << " ";
-                } else {
-                    // print character normally
+                if ((int) buffer[j] >= 32 && (int) buffer[j] <= 126) {
+                    // only print readable characters
                     std::cout << buffer[j];
+                } else {
+                    // print space if character is garbage
+                    std::cout << " ";
                 }
             }
 
@@ -84,17 +84,25 @@ void vdi::printBuffer(const char *buffer, int size) {
 
     // still need to print one more line of normal text
 
-    // move 4 spaces away from hex block
-    std::cout << "    ";
-
-    // loop through last 16
-    for (int i = size - 16; i < size; ++i) {
-        if (buffer[i] == '\n') {
-            // print a space instead of a newline
+    // if the final hex line is not a full line
+    if (size % 16 != 0) {
+        for (int i = 0; i < (16 - (size % 16)) * 3; ++i) {
+            // fill the remaining area with spaces
             std::cout << " ";
-        } else {
-            // print character normally
+        }
+    }
+
+    // move 4 spaces away from hex block
+    std::cout << "   ";
+
+    // loop through the remainder of the buffer to print the final line of text
+    for (int i = size - (size - (size % 16) == size ? 16 : size % 16); i < size; ++i) {
+        if ((int) buffer[i] >= 32 && (int) buffer[i] <= 126) {
+            // only print readable characters
             std::cout << buffer[i];
+        } else {
+            // print space if character is garbage
+            std::cout << " ";
         }
     }
 
