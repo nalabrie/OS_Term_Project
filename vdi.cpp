@@ -53,6 +53,9 @@ void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
 
 // prints the given buffer in both hexadecimal and characters
 void vdi::printBuffer(const char *buffer, int size) {
+    // save existing cout settings (to restore later)
+    std::ios_base::fmtflags oldFlags(std::cout.flags());
+
     // loop through entire 'buffer'
     for (int i = 0; i < size; ++i) {
         // condition is true every 16 loops
@@ -108,4 +111,7 @@ void vdi::printBuffer(const char *buffer, int size) {
 
     // end line
     std::cout << std::endl;
+
+    // restore cout settings
+    std::cout.flags(oldFlags);
 }
