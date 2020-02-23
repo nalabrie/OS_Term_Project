@@ -7,14 +7,15 @@ using namespace std;
 
 int main(int argc, char **argv) {
     vdi file = vdi(argv[1]);
-    int size = 64;
+    int size = 4;
     char buffer[size];
 
-    cout << 0x100000;
+    file.seek(0x168);
+    file.read(buffer, size);
 
-//    file.seek(0x2001BE);
-//    file.read(buffer, size);
-//    vdi::printBuffer(buffer, size);
+    cout << vdi::littleEndianToInt(buffer, size) << endl;
+
+    vdi::printBuffer(buffer, size);
 
     return 0;
 }

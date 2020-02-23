@@ -52,8 +52,11 @@ public:
     // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
     void seek(std::ios::off_type offset, std::ios_base::seekdir direction);
 
-    // prints the given buffer in both hexadecimal and characters
+    // prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
     static void printBuffer(const char *buffer, int size);
+
+    // converts the given character buffer from little endian to a single int ('size' = length of buffer)
+    static int littleEndianToInt(const char *buffer, int size);
 };
 
 

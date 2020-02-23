@@ -51,7 +51,7 @@ void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
     VDI_file.seekg(offset, direction);
 }
 
-// prints the given buffer in both hexadecimal and characters
+// prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
 void vdi::printBuffer(const char *buffer, int size) {
     // save existing cout settings (to restore later)
     std::ios_base::fmtflags oldFlags(std::cout.flags());
@@ -114,4 +114,28 @@ void vdi::printBuffer(const char *buffer, int size) {
 
     // restore cout settings
     std::cout.flags(oldFlags);
+}
+
+// converts the given character buffer from little endian to a single int ('size' = length of buffer)
+int vdi::littleEndianToInt(const char *buffer, int size) {
+    // save existing stringstream settings (to restore later)
+    std::ios_base::fmtflags oldFlags(std::stringstream().flags());
+
+    // stringstream to store buffer in reverse order
+    std::stringstream ss;
+
+    // loop through buffer in reverse
+    for (int i = size - 1; i >= 0; --i) {
+        // concatenate each character in buffer as hex to the stringstream
+        ss << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) buffer[i];
+    }
+
+    // store resulting stringstream as int
+    int result;
+    ss >> result;
+
+    // restore stringstream settings
+    std::stringstream().flags(oldFlags);
+
+    return result;
 }
