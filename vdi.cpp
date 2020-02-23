@@ -13,6 +13,9 @@ vdi::vdi(const char *filePath) : filePath(filePath) {
 
     // fill out the header struct with the opened file
     setHeader();
+
+    // reset file cursor
+    VDI_file.seekg(0);
 }
 
 // read 'size' amount bytes from VDI into buffer (starting at cursor)
