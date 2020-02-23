@@ -11,20 +11,8 @@ vdi::vdi(const char *filePath) : filePath(filePath) {
     // open the VDI file with the path given
     VDI_file.open(filePath);
 
-    // get the VDI header from the file
+    // fill out the header struct with the opened file
     setHeader();
-}
-
-// sets the 'header' string by getting the header from the VDI file
-void vdi::setHeader() {
-    // move cursor to the start of the header
-    VDI_file.seekg(HEADER_START);
-
-    // read the header into the 'header' string
-    VDI_file.read(header, HEADER_SIZE);
-
-    // reset file cursor
-    VDI_file.seekg(0);
 }
 
 // read 'size' amount bytes from VDI into buffer (starting at cursor)
@@ -127,7 +115,7 @@ int vdi::littleEndianToInt(const char *buffer, int size) {
     // loop through buffer in reverse
     for (int i = size - 1; i >= 0; --i) {
         // concatenate each character in buffer as hex to the stringstream
-        ss << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) buffer[i];
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int) (uint8_t) buffer[i];
     }
 
     // store resulting stringstream as int
@@ -138,4 +126,47 @@ int vdi::littleEndianToInt(const char *buffer, int size) {
     std::stringstream().flags(oldFlags);
 
     return result;
+}
+
+// sets the values in the header struct
+void vdi::setHeader() {
+    // temporary buffer for reading in header values
+    char buffer[8];
+
+    // get image type (1 = dynamic, 2 = static)
+    VDI_file.seekg(0x4c);
+    VDI_file.read(buffer, 4);
+    header.imageType = littleEndianToInt(buffer, 4);
+
+    // get offset blocks
+    VDI_file.seekg(0x154);
+    VDI_file.read(buffer, 4);
+    header.offsetBlocks = littleEndianToInt(buffer, 4);
+
+    // get offset data
+    VDI_file.read(buffer, 4);
+    header.offsetData = littleEndianToInt(buffer, 4);
+
+    // get sector size
+    VDI_file.seekg(0x168);
+    VDI_file.read(buffer, 4);
+    header.sectorSize = littleEndianToInt(buffer, 4);
+
+    // get disk size
+    VDI_file.seekg(0x170);
+    VDI_file.read(buffer, 8);
+    header.diskSize = littleEndianToInt(buffer, 8);
+
+    // get block size
+    VDI_file.read(buffer, 4);
+    header.blockSize = littleEndianToInt(buffer, 4);
+
+    // get blocks in HDD
+    VDI_file.seekg(0x180);
+    VDI_file.read(buffer, 4);
+    header.blocksInHDD = littleEndianToInt(buffer, 4);
+
+    // get blocks allocated
+    VDI_file.read(buffer, 4);
+    header.blocksAllocated = littleEndianToInt(buffer, 4);
 }

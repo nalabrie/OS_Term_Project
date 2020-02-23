@@ -21,17 +21,19 @@ private:
 
     /* METHODS */
 
-    // sets the 'header' string
+    // sets the values in the header struct
     void setHeader();
 
 public:
     /* VARIABLES */
 
-    // string of header
-    char header[HEADER_SIZE];
-
     // path of the opened VDI file
     const char *filePath;
+
+    // structure of the VDI header
+    struct header {
+        unsigned int imageType, offsetBlocks, offsetData, sectorSize, diskSize, blockSize, blocksInHDD, blocksAllocated;
+    } header;
 
     /* CONSTRUCTORS */
 
