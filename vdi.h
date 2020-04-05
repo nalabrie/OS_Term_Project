@@ -24,16 +24,33 @@ private:
     // sets the values in the header struct
     void setHeader();
 
+    // sets the values of the partition table
+    void setPartitionTable();
+
+    // sets the values in the superblock struct
+    void setSuperblock();
+
 public:
     /* VARIABLES */
-
-    // path of the opened VDI file
-    const char *filePath;
 
     // structure of the VDI header
     struct header {
         unsigned int imageType, offsetBlocks, offsetData, sectorSize, diskSize, blockSize, blocksInHDD, blocksAllocated;
     } header;
+
+    // structure of the VDI partitions
+    struct partitionEntry {
+        unsigned int status, firstSectorCHS[3], lastSectorCHS[3], type, first_LBA_sector, LBA_sector_count;
+    };
+
+    // structure of the VDI superblock
+    struct superblock {} superblock;
+
+    // path of the opened VDI file
+    const char *filePath;
+
+    // partition table represented as an array of partition entries
+    partitionEntry partitionTable[4];
 
     /* CONSTRUCTORS */
 
