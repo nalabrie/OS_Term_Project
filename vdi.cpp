@@ -14,6 +14,9 @@ vdi::vdi(const char *filePath) : filePath(filePath) {
     // fill out the header struct with the opened file
     setHeader();
 
+    // fill out the partition table struct with the opened file
+    setPartitionTable();
+
     // reset file cursor
     VDI_file.seekg(0);
 }
@@ -172,4 +175,48 @@ void vdi::setHeader() {
     // get blocks allocated
     VDI_file.read(buffer, 4);
     header.blocksAllocated = littleEndianToInt(buffer, 4);
+}
+
+// sets the values of the partition table
+void vdi::setPartitionTable() {
+    // temporary buffer for reading in partition entry values
+    char buffer[4];
+
+    // move cursor to start of partition table
+    VDI_file.seekg(header.offsetData + 0x1be);
+
+    // loop through all 4 partition entries in the partition table
+    for (int i = 0; i < 4; ++i) {
+        // get status (active/inactive)
+        VDI_file.read(buffer, 1);
+        partitionTable[i].status = littleEndianToInt(buffer, 1);
+
+        // get first sector CHS
+        VDI_file.read(buffer, 1);
+        partitionTable[i].firstSectorCHS[1] = littleEndianToInt(buffer, 1);
+        VDI_file.read(buffer, 1);
+        partitionTable[i].firstSectorCHS[2] = littleEndianToInt(buffer, 1);
+        VDI_file.read(buffer, 1);
+        partitionTable[i].firstSectorCHS[0] = littleEndianToInt(buffer, 1);
+
+        // get partition type
+        VDI_file.read(buffer, 1);
+        partitionTable[i].type = littleEndianToInt(buffer, 1);
+
+        // get last sector CHS
+        VDI_file.read(buffer, 1);
+        partitionTable[i].lastSectorCHS[1] = littleEndianToInt(buffer, 1);
+        VDI_file.read(buffer, 1);
+        partitionTable[i].lastSectorCHS[2] = littleEndianToInt(buffer, 1);
+        VDI_file.read(buffer, 1);
+        partitionTable[i].lastSectorCHS[0] = littleEndianToInt(buffer, 1);
+
+        // get first LBA sector
+        VDI_file.read(buffer, 4);
+        partitionTable[i].first_LBA_sector = littleEndianToInt(buffer, 4);
+
+        // get LBA sector count
+        VDI_file.read(buffer, 4);
+        partitionTable[i].LBA_sector_count = littleEndianToInt(buffer, 4);
+    }
 }
