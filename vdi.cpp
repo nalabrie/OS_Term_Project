@@ -186,37 +186,37 @@ void vdi::setPartitionTable() {
     VDI_file.seekg(header.offsetData + 0x1be);
 
     // loop through all 4 partition entries in the partition table
-    for (int i = 0; i < 4; ++i) {
+    for (auto &entry : partitionTable) {
         // get status (active/inactive)
         VDI_file.read(buffer, 1);
-        partitionTable[i].status = littleEndianToInt(buffer, 1);
+        entry.status = littleEndianToInt(buffer, 1);
 
         // get first sector CHS
         VDI_file.read(buffer, 1);
-        partitionTable[i].firstSectorCHS[1] = littleEndianToInt(buffer, 1);
+        entry.firstSectorCHS[1] = littleEndianToInt(buffer, 1);
         VDI_file.read(buffer, 1);
-        partitionTable[i].firstSectorCHS[2] = littleEndianToInt(buffer, 1);
+        entry.firstSectorCHS[2] = littleEndianToInt(buffer, 1);
         VDI_file.read(buffer, 1);
-        partitionTable[i].firstSectorCHS[0] = littleEndianToInt(buffer, 1);
+        entry.firstSectorCHS[0] = littleEndianToInt(buffer, 1);
 
         // get partition type
         VDI_file.read(buffer, 1);
-        partitionTable[i].type = littleEndianToInt(buffer, 1);
+        entry.type = littleEndianToInt(buffer, 1);
 
         // get last sector CHS
         VDI_file.read(buffer, 1);
-        partitionTable[i].lastSectorCHS[1] = littleEndianToInt(buffer, 1);
+        entry.lastSectorCHS[1] = littleEndianToInt(buffer, 1);
         VDI_file.read(buffer, 1);
-        partitionTable[i].lastSectorCHS[2] = littleEndianToInt(buffer, 1);
+        entry.lastSectorCHS[2] = littleEndianToInt(buffer, 1);
         VDI_file.read(buffer, 1);
-        partitionTable[i].lastSectorCHS[0] = littleEndianToInt(buffer, 1);
+        entry.lastSectorCHS[0] = littleEndianToInt(buffer, 1);
 
         // get first LBA sector
         VDI_file.read(buffer, 4);
-        partitionTable[i].first_LBA_sector = littleEndianToInt(buffer, 4);
+        entry.first_LBA_sector = littleEndianToInt(buffer, 4);
 
         // get LBA sector count
         VDI_file.read(buffer, 4);
-        partitionTable[i].LBA_sector_count = littleEndianToInt(buffer, 4);
+        entry.LBA_sector_count = littleEndianToInt(buffer, 4);
     }
 }
