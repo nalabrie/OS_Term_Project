@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     cout << dec;
 
     for (int i = 0; i < 4; ++i) {
-        cout << "partition " << i + 1 << "..." << endl;
+        cout << "partition #" << i + 1 << "..." << endl;
         cout << "status: " << file.partitionTable[i].status << endl;
         cout << "firstSectorCHS: " << file.partitionTable[i].firstSectorCHS[0] << ", "
              << file.partitionTable[i].firstSectorCHS[1] << ", " << file.partitionTable[i].firstSectorCHS[2] << endl;

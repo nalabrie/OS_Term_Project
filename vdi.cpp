@@ -220,3 +220,24 @@ void vdi::setPartitionTable() {
         entry.LBA_sector_count = littleEndianToInt(buffer, 4);
     }
 }
+
+// open a partition by its number (1-4)
+void vdi::partitionOpen(int number) {
+}
+
+// read 'size' amount bytes from the opened partition into buffer (starting at cursor)
+void vdi::partitionRead(char *buffer, std::streamsize size) {
+}
+
+// write 'size' amount bytes from 'buffer' to the opened partition (starting at cursor)
+void vdi::partitionWrite(const char *buffer, std::streamsize size) {
+}
+
+// sets the position of the file cursor to byte 'position' (0 = start of the opened partition)
+void vdi::partitionSeek(std::ios::pos_type position) {
+}
+
+// offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
+// (beg = start of opened partition, cur = current cursor position, end = end of opened partition)
+void vdi::partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direction) {
+}

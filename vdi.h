@@ -15,6 +15,9 @@ private:
     // the actual VDI file on the disk
     std::fstream VDI_file;
 
+    // the currently opened partition number (0 = no opened partition)
+    int openedPartition = 0;
+
     // header starting byte and size
     static const int HEADER_START = 0;
     static const int HEADER_SIZE = 400;
@@ -76,6 +79,22 @@ public:
 
     // converts the given character buffer from little endian to a single int ('size' = length of buffer)
     static int littleEndianToInt(const char *buffer, int size);
+
+    // open a partition by its number (1-4)
+    void partitionOpen(int number);
+
+    // read 'size' amount bytes from the opened partition into buffer (starting at cursor)
+    void partitionRead(char *buffer, std::streamsize size);
+
+    // write 'size' amount bytes from 'buffer' to the opened partition (starting at cursor)
+    void partitionWrite(const char *buffer, std::streamsize size);
+
+    // sets the position of the file cursor to byte 'position' (0 = start of the opened partition)
+    void partitionSeek(std::ios::pos_type position);
+
+    // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
+    // (beg = start of opened partition, cur = current cursor position, end = end of opened partition)
+    void partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direction);
 };
 
 
