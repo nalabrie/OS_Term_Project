@@ -307,6 +307,9 @@ void vdi::partitionWrite(const char *buffer, std::streamsize size) {
 
     // write buffer to the partition
     VDI_file.write(buffer, size);
+
+    // this is needed or future 'tellg()' calls return -1 and I don't understand why
+    VDI_file.clear();
 }
 
 // sets the position of the file cursor to byte 'position' (0 = start of the opened partition)
