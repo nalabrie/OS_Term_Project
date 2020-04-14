@@ -236,12 +236,34 @@ void vdi::partitionOpen(int number) {
     // set opened partition
     openedPartition = number;
 
+    // set opened partition start and end locations
+    openedPartitionStart = partitionTable[number - 1].first_LBA_sector * header.sectorSize;
+    openedPartitionEnd = openedPartitionStart + partitionTable[number - 1].LBA_sector_count;
+
     // set cursor to the start of the partition
-    VDI_file.seekg(partitionTable[number - 1].first_LBA_sector * header.sectorSize);
+    VDI_file.seekg(openedPartitionStart);
 }
 
 // read 'size' amount bytes from the opened partition into buffer (starting at cursor)
 void vdi::partitionRead(char *buffer, std::streamsize size) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot read, no partition is opened");
+    }
+
+    // check that the cursor is within the opened partition
+    if (VDI_file.tellg() < openedPartitionStart || VDI_file.tellg() > openedPartitionEnd) {
+        throw std::out_of_range("cannot read, cursor is out of bounds of the opened partition");
+    }
+
+    // check that the size to read isn't too big
+    if ((VDI_file.tellg() + size) > openedPartitionEnd) {
+        throw std::out_of_range(
+                "cannot read, size to read is too large and exceeds the bounds of the opened partition");
+    }
+
+    // read into given buffer
+    VDI_file.read(buffer, size);
 }
 
 // write 'size' amount bytes from 'buffer' to the opened partition (starting at cursor)

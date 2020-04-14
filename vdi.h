@@ -18,6 +18,12 @@ private:
     // the currently opened partition number (0 = no opened partition)
     int openedPartition = 0;
 
+    // the currently opened partition start (0 = no opened partition)
+    unsigned int openedPartitionStart = 0;
+
+    // the currently opened partition end (0 = no opened partition)
+    unsigned int openedPartitionEnd = 0;
+
     // header starting byte and size
     static const int HEADER_START = 0;
     static const int HEADER_SIZE = 400;
@@ -47,7 +53,8 @@ public:
     };
 
     // structure of the VDI superblock
-    struct superblock {} superblock;
+    struct superblock {
+    } superblock;
 
     // path of the opened VDI file
     const char *filePath;

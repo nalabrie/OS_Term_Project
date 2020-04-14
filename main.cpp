@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     }
 
     file.partitionOpen(1);
-    file.read(buffer, size);
+    file.partitionRead(buffer, size);
     vdi::printBuffer(buffer, size);
 
     return 0;
