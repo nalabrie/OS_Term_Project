@@ -15,6 +15,9 @@ private:
     // the actual VDI file on the disk
     std::fstream VDI_file;
 
+    // size of the VDI file (0 = file not opened)
+    int fileSize = 0;
+
     // the currently opened partition number (0 = no opened partition)
     int openedPartition = 0;
 
@@ -23,10 +26,6 @@ private:
 
     // the currently opened partition end (0 = no opened partition)
     unsigned int openedPartitionEnd = 0;
-
-    // header starting byte and size
-    static const int HEADER_START = 0;
-    static const int HEADER_SIZE = 400;
 
     /* METHODS */
 
@@ -80,6 +79,9 @@ public:
 
     // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
     void seek(std::ios::off_type offset, std::ios_base::seekdir direction);
+
+    // gets the position of the cursor within the VDI file
+    std::ios::pos_type cursor();
 
     // prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
     static void printBuffer(const char *buffer, int size);

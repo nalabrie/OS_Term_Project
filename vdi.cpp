@@ -17,20 +17,33 @@ vdi::vdi(const char *filePath) : filePath(filePath) {
     // fill out the partition table struct with the opened file
     setPartitionTable();
 
+    // get file size
+    VDI_file.seekg(0, std::ios::end);
+    fileSize = VDI_file.tellg();
+
     // reset file cursor
     VDI_file.seekg(0);
+
+    // this is needed or future 'tellg()' calls return -1 and I don't understand why
+    VDI_file.clear();
 }
 
 // read 'size' amount bytes from VDI into buffer (starting at cursor)
 void vdi::read(char *buffer, std::streamsize size) {
     // forward parameters to the builtin 'fstream' method
     VDI_file.read(buffer, size);
+
+    // this is needed or future 'tellg()' calls return -1 and I don't understand why
+    VDI_file.clear();
 }
 
 // write 'size' amount bytes from 'buffer' to VDI (starting at cursor)
 void vdi::write(const char *buffer, std::streamsize size) {
     // forward parameters to the builtin 'fstream' method
     VDI_file.write(buffer, size);
+
+    // this is needed or future 'tellg()' calls return -1 and I don't understand why
+    VDI_file.clear();
 }
 
 // sets the position of the file cursor to byte 'position'
@@ -43,6 +56,11 @@ void vdi::seek(std::ios::pos_type position) {
 void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
     // forward parameters to the builtin 'fstream' method
     VDI_file.seekg(offset, direction);
+}
+
+// gets the position of the cursor within the VDI file
+std::ios::pos_type vdi::cursor() {
+    return VDI_file.tellg();
 }
 
 // prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
@@ -264,17 +282,54 @@ void vdi::partitionRead(char *buffer, std::streamsize size) {
 
     // read into given buffer
     VDI_file.read(buffer, size);
+
+    // this is needed or future 'tellg()' calls return -1 and I don't understand why
+    VDI_file.clear();
 }
 
 // write 'size' amount bytes from 'buffer' to the opened partition (starting at cursor)
 void vdi::partitionWrite(const char *buffer, std::streamsize size) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot write, no partition is opened");
+    }
+
+    // check that the cursor is within the opened partition
+    if (VDI_file.tellg() < openedPartitionStart || VDI_file.tellg() > openedPartitionEnd) {
+        throw std::out_of_range("cannot write, cursor is out of bounds of the opened partition");
+    }
+
+    // check that the size to write isn't too big
+    if ((VDI_file.tellg() + size) > openedPartitionEnd) {
+        throw std::out_of_range(
+                "cannot write, size to write is too large and exceeds the bounds of the opened partition");
+    }
+
+    // write buffer to the partition
+    VDI_file.write(buffer, size);
 }
 
 // sets the position of the file cursor to byte 'position' (0 = start of the opened partition)
 void vdi::partitionSeek(std::ios::pos_type position) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot seek, no partition is opened");
+    }
+
+    // check that the desired position is within the bounds of the opened partition
+    if (position < openedPartitionStart || position > openedPartitionEnd) {
+        throw std::out_of_range("cannot seek, the given position is outside the range of the opened partition");
+    }
+
+    // seek to 'position'
+    VDI_file.seekg(position);
 }
 
 // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
 // (beg = start of opened partition, cur = current cursor position, end = end of opened partition)
 void vdi::partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direction) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot seek, no partition is opened");
+    }
 }
