@@ -223,6 +223,21 @@ void vdi::setPartitionTable() {
 
 // open a partition by its number (1-4)
 void vdi::partitionOpen(int number) {
+    // check for valid partition number
+    if (number < 1 || number > 4) {
+        throw std::invalid_argument("partition number must be 1-4, received: " + std::to_string(number));
+    }
+
+    // check that the selected partition is formatted
+    if (partitionTable[number - 1].LBA_sector_count == 0) {
+        throw std::runtime_error("partition " + std::to_string(number) + " is not formatted and cannot be opened");
+    }
+
+    // set opened partition
+    openedPartition = number;
+
+    // set cursor to the start of the partition
+    VDI_file.seekg(partitionTable[number - 1].first_LBA_sector * header.sectorSize);
 }
 
 // read 'size' amount bytes from the opened partition into buffer (starting at cursor)

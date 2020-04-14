@@ -10,8 +10,8 @@ int main(int argc, char **argv) {
 
     /* TESTING */
 
-//    static const int size = 64;
-//    char buffer[size];
+    static const int size = 512;
+    char buffer[size];
 //    file.seek(file.header.offsetData + 0x1be);  // partition table
 //    file.read(buffer, size);
 //    vdi::printBuffer(buffer, size);
@@ -48,6 +48,10 @@ int main(int argc, char **argv) {
         cout << "first_LBA_sector: " << file.partitionTable[i].first_LBA_sector << endl;
         cout << "LBA_sector_count: " << file.partitionTable[i].LBA_sector_count << endl << endl;
     }
+
+    file.partitionOpen(1);
+    file.read(buffer, size);
+    vdi::printBuffer(buffer, size);
 
     return 0;
 }
