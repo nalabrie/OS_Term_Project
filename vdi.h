@@ -68,6 +68,9 @@ public:
 
     /* METHODS */
 
+    // TODO: read, write, and both versions of seek might not ever be used
+    // TODO: read, write, and both versions of seek don't ensure file start/end bounds are respected
+
     // read 'size' amount bytes from VDI into buffer (starting at cursor)
     void read(char *buffer, std::streamsize size);
 

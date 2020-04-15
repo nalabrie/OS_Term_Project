@@ -53,6 +53,7 @@ void vdi::seek(std::ios::pos_type position) {
 }
 
 // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
+// (beg = start of opened VDI file, cur = current cursor position, end = end of opened VDI file)
 void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
     // forward parameters to the builtin 'fstream' method
     VDI_file.seekg(offset, direction);
@@ -335,4 +336,44 @@ void vdi::partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direct
     if (openedPartition == 0) {
         throw std::runtime_error("cannot seek, no partition is opened");
     }
+
+    // position to be moved to (after calculations)
+    unsigned int position = 0;
+
+    // check that the desired position is within the bounds of the opened partition
+    switch (direction) {
+        case std::ios::beg:
+            // check bounds
+            if (offset < 0 || offset > (openedPartitionEnd - openedPartitionStart)) {
+                throw std::out_of_range("cannot seek, the given position is outside the range of the opened partition");
+            }
+
+            // calculate position
+            position = openedPartitionStart + offset;
+            break;
+        case std::ios::cur:
+            // check bounds
+            if ((VDI_file.tellg() + offset) < openedPartitionStart ||
+                (VDI_file.tellg() + offset) > openedPartitionEnd) {
+                throw std::out_of_range("cannot seek, the given position is outside the range of the opened partition");
+            }
+
+            // calculate position
+            position = VDI_file.tellg() + offset;
+            break;
+        case std::ios::end:
+            // check bounds
+            if (offset > 0 || (offset + openedPartitionEnd) < openedPartitionStart) {
+                throw std::out_of_range("cannot seek, the given position is outside the range of the opened partition");
+            }
+
+            // calculate position
+            position = offset + openedPartitionEnd;
+            break;
+        default:
+            throw std::invalid_argument("'direction' argument is invalid, must be 'beg', 'cur', or 'end'");
+    }
+
+    // seek to desired offset
+    VDI_file.seekg(position);
 }
