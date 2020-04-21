@@ -17,6 +17,9 @@ vdi::vdi(const char *filePath) : filePath(filePath) {
     // fill out the partition table struct with the opened file
     setPartitionTable();
 
+    // fill out the superblock struct with the opened file
+    setSuperblock();
+
     // get file size
     VDI_file.seekg(0, std::ios::end);
     fileSize = VDI_file.tellg();
@@ -387,6 +390,7 @@ void vdi::partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direct
     // seek to desired offset
     VDI_file.seekg(position);
 }
+
 // sets the values in the superblock struct
 void vdi::setSuperblock() {
 }

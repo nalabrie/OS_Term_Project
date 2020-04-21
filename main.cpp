@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 
     /* TESTING */
 
-    static const int size = 512;
+    static const int size = 4;
     char buffer[size];
 //    file.seek(file.header.offsetData + 0x1be);  // partition table
 //    file.read(buffer, size);
@@ -19,6 +19,8 @@ int main(int argc, char **argv) {
     file.partitionOpen(1);
     file.partitionSeek(1024);
     file.partitionRead(buffer, size);
+    int a = vdi::littleEndianToInt(buffer, size);
+    cout << a << endl;
     vdi::printBuffer(buffer, size);
 
     // note: superblock is offsetData + blockSize + 1024, aka 0x300400
@@ -53,6 +55,24 @@ int main(int argc, char **argv) {
 //        cout << "first_LBA_sector: " << file.partitionTable[i].first_LBA_sector << endl;
 //        cout << "LBA_sector_count: " << file.partitionTable[i].LBA_sector_count << endl << endl;
 //    }
+
+    cout << "number of inodes: " << file.superblock.inodeCount << endl;
+    cout << "number of blocks: " << file.superblock.blockCount << endl;
+    cout << "number of reserved blocks: " << file.superblock.reservedBlockCount << endl;
+    cout << "number of free blocks: " << file.superblock.freeBlockCount << endl;
+    cout << "number of free inodes: " << file.superblock.freeInodeCount << endl;
+    cout << "first data block: " << file.superblock.firstDataBlock << endl;
+    cout << "log block size: " << file.superblock.logBlockSize << endl;
+    cout << "log fragment size: " << file.superblock.logFragmentSize << endl;
+    cout << "blocks per group: " << file.superblock.blocksPerGroup << endl;
+    cout << "fragments per group: " << file.superblock.fragmentsPerGroup << endl;
+    cout << "inodes per group: " << file.superblock.inodesPerGroup << endl;
+    cout << "magic number: " << file.superblock.magicNumber << endl;
+    cout << "state: " << file.superblock.state << endl;
+    cout << "first inode number: " << file.superblock.firstInodeNumber << endl;
+    cout << "inode size: " << file.superblock.inodeSize << endl;
+    cout << "block size: " << file.superblock.blockSize << endl;
+    cout << "block group count: " << file.superblock.blockGroupCount << endl;
 
     return 0;
 }
