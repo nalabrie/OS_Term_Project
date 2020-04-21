@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 #include "vdi.h"
 
 // default constructor, takes path to VDI file
@@ -393,4 +394,81 @@ void vdi::partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direct
 
 // sets the values in the superblock struct
 void vdi::setSuperblock() {
+    // temporary buffer for reading in superblock values
+    char buffer[4];
+
+    // move cursor to start of main superblock
+    partitionOpen(1);
+    partitionSeek(1024);
+
+    // get inode count
+    partitionRead(buffer, 4);
+    superblock.inodeCount = littleEndianToInt(buffer, 4);
+
+    // get block count
+    partitionRead(buffer, 4);
+    superblock.blockCount = littleEndianToInt(buffer, 4);
+
+    // get reserved block count
+    partitionRead(buffer, 4);
+    superblock.reservedBlockCount = littleEndianToInt(buffer, 4);
+
+    // get free block count
+    partitionRead(buffer, 4);
+    superblock.freeBlockCount = littleEndianToInt(buffer, 4);
+
+    // get free inode count
+    partitionRead(buffer, 4);
+    superblock.freeInodeCount = littleEndianToInt(buffer, 4);
+
+    // get first data block
+    partitionRead(buffer, 4);
+    superblock.firstDataBlock = littleEndianToInt(buffer, 4);
+
+    // get log block size
+    partitionRead(buffer, 4);
+    superblock.logBlockSize = littleEndianToInt(buffer, 4);
+
+    // get log fragment size
+    partitionRead(buffer, 4);
+    superblock.logFragmentSize = littleEndianToInt(buffer, 4);
+
+    // get blocks per group
+    partitionRead(buffer, 4);
+    superblock.blocksPerGroup = littleEndianToInt(buffer, 4);
+
+    // get fragments per group
+    partitionRead(buffer, 4);
+    superblock.fragmentsPerGroup = littleEndianToInt(buffer, 4);
+
+    // get inodes per group
+    partitionRead(buffer, 4);
+    superblock.inodesPerGroup = littleEndianToInt(buffer, 4);
+
+    // get magic number
+    partitionSeek(12, std::ios::cur);
+    partitionRead(buffer, 2);
+    superblock.magicNumber = littleEndianToInt(buffer, 2);
+
+    // get state
+    partitionRead(buffer, 2);
+    superblock.state = littleEndianToInt(buffer, 2);
+
+    // get first inode number
+    partitionSeek(24, std::ios::cur);
+    partitionRead(buffer, 4);
+    superblock.firstInodeNumber = littleEndianToInt(buffer, 4);
+
+    // get inode size
+    partitionRead(buffer, 2);
+    superblock.inodeSize = littleEndianToInt(buffer, 2);
+
+    // get block size
+    superblock.blockSize = (unsigned int) 1024 << superblock.logBlockSize;
+
+    // get block group count
+    superblock.blockGroupCount = ceil((double) superblock.blockCount / (double) superblock.blocksPerGroup);
+
+    // close the partition
+    partitionClose();
 }

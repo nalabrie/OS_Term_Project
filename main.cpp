@@ -16,12 +16,12 @@ int main(int argc, char **argv) {
 //    file.read(buffer, size);
 //    vdi::printBuffer(buffer, size);
 
-    file.partitionOpen(1);
-    file.partitionSeek(1024);
-    file.partitionRead(buffer, size);
-    int a = vdi::littleEndianToInt(buffer, size);
-    cout << a << endl;
-    vdi::printBuffer(buffer, size);
+//    file.partitionOpen(1);
+//    file.partitionSeek(1024);
+//    file.partitionRead(buffer, size);
+//    int a = vdi::littleEndianToInt(buffer, size);
+//    cout << a << endl;
+//    vdi::printBuffer(buffer, size);
 
     // note: superblock is offsetData + blockSize + 1024, aka 0x300400
 
@@ -56,6 +56,8 @@ int main(int argc, char **argv) {
 //        cout << "LBA_sector_count: " << file.partitionTable[i].LBA_sector_count << endl << endl;
 //    }
 
+//    cout << endl << "SUPERBLOCK" << endl << endl;
+
     cout << "number of inodes: " << file.superblock.inodeCount << endl;
     cout << "number of blocks: " << file.superblock.blockCount << endl;
     cout << "number of reserved blocks: " << file.superblock.reservedBlockCount << endl;
@@ -67,7 +69,7 @@ int main(int argc, char **argv) {
     cout << "blocks per group: " << file.superblock.blocksPerGroup << endl;
     cout << "fragments per group: " << file.superblock.fragmentsPerGroup << endl;
     cout << "inodes per group: " << file.superblock.inodesPerGroup << endl;
-    cout << "magic number: " << file.superblock.magicNumber << endl;
+    cout << "magic number: 0x" << hex << file.superblock.magicNumber << dec << endl;
     cout << "state: " << file.superblock.state << endl;
     cout << "first inode number: " << file.superblock.firstInodeNumber << endl;
     cout << "inode size: " << file.superblock.inodeSize << endl;
