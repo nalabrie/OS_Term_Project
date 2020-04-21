@@ -256,8 +256,8 @@ void vdi::partitionOpen(int number) {
     openedPartition = number;
 
     // set opened partition start and end locations
-    openedPartitionStart = partitionTable[number - 1].first_LBA_sector * header.sectorSize;
-    openedPartitionEnd = openedPartitionStart + partitionTable[number - 1].LBA_sector_count;
+    openedPartitionStart = (partitionTable[number - 1].first_LBA_sector * header.sectorSize) + header.offsetData;
+    openedPartitionEnd = (openedPartitionStart + partitionTable[number - 1].LBA_sector_count) + header.offsetData;
 
     // set cursor to the start of the partition
     VDI_file.seekg(openedPartitionStart);
