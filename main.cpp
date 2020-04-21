@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 //    vdi::printBuffer(buffer, size);
 
     file.partitionOpen(1);
-    file.partitionSeek(1024, ios::cur);
+    file.partitionSeek(1024);
     file.partitionRead(buffer, size);
     vdi::printBuffer(buffer, size);
 

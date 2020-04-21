@@ -322,6 +322,9 @@ void vdi::partitionWrite(const char *buffer, std::streamsize size) {
 
 // sets the position of the file cursor to byte 'position' (0 = start of the opened partition)
 void vdi::partitionSeek(std::ios::pos_type position) {
+    // offset the position
+    position += openedPartitionStart;
+
     // check that a partition is opened
     if (openedPartition == 0) {
         throw std::runtime_error("cannot seek, no partition is opened");
