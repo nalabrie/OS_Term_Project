@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 
     /* TESTING */
 
-    static const int size = 4;
+    static const unsigned int size = file.superblock.blockSize;
     char buffer[size];
 
 //    file.seek(file.header.offsetData + 0x1be);  // partition table
@@ -25,6 +25,10 @@ int main(int argc, char **argv) {
 //    vdi::printBuffer(buffer, size);
 
     struct vdi::superblock a{};
+
+    file.partitionOpen(1);
+    file.fetchBlock(buffer, 2);
+    vdi::printBuffer(buffer, size);
 
     // note: superblock is offsetData + blockSize + 1024, aka 0x300400
 
@@ -60,7 +64,7 @@ int main(int argc, char **argv) {
 //    }
 
 //    cout << endl << "SUPERBLOCK" << endl << endl;
-
+//
 //    cout << "number of inodes: " << file.superblock.inodeCount << endl;
 //    cout << "number of blocks: " << file.superblock.blockCount << endl;
 //    cout << "number of reserved blocks: " << file.superblock.reservedBlockCount << endl;

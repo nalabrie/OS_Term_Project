@@ -480,26 +480,62 @@ void vdi::setSuperblock() {
 
 // read the block indicated by 'blockNum' into the buffer (buffer must be at least size 'superblock.blockSize')
 void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot fetch block, no partition is opened");
+    }
+
+    // set file cursor to the start of the desired block
+    partitionSeek(blockNum * superblock.blockSize, std::ios::beg);
+
+    // read block into buffer
+    partitionRead(buffer, superblock.blockSize);
 }
 
 // write the contents of the buffer into the block indicated by 'blockNum'
 // (buffer cannot be bigger than 'superblock.blockSize')
 void vdi::writeBlock(const char *buffer, unsigned int blockNum) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot write block, no partition is opened");
+    }
+
+    // set file cursor to the start of the desired block
+    partitionSeek(blockNum * superblock.blockSize, std::ios::beg);
+
+    // write buffer into block
+    partitionWrite(buffer, superblock.blockSize);
 }
 
 // read the superblock into the supplied structure at the specified block number
 void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot fetch superblock, no partition is opened");
+    }
 }
 
 // write the supplied superblock structure into the superblock at the specified block number
 void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNum) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot write superblock, no partition is opened");
+    }
 }
 
 // read the block group descriptor table into the supplied structure at the specified block number
 void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable &bgdt, unsigned int blockNum) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot fetch block group descriptor table, no partition is opened");
+    }
 }
 
 // write the supplied block group descriptor table structure into the block group descriptor table
 // at the specified block number
 void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable &bgdt, unsigned int blockNum) {
+    // check that a partition is opened
+    if (openedPartition == 0) {
+        throw std::runtime_error("cannot write block group descriptor table, no partition is opened");
+    }
 }
