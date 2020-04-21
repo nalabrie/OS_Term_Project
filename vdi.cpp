@@ -263,6 +263,13 @@ void vdi::partitionOpen(int number) {
     VDI_file.seekg(openedPartitionStart);
 }
 
+// close the opened partition (only one can be opened at a time)
+void vdi::partitionClose() {
+    openedPartition = 0;
+    openedPartitionStart = 0;
+    openedPartitionEnd = 0;
+}
+
 // read 'size' amount bytes from the opened partition into buffer (starting at cursor)
 void vdi::partitionRead(char *buffer, std::streamsize size) {
     // check that a partition is opened

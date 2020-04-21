@@ -95,6 +95,9 @@ public:
     // open a partition by its number (1-4)
     void partitionOpen(int number);
 
+    // close the opened partition (only one can be opened at a time)
+    void partitionClose();
+
     // read 'size' amount bytes from the opened partition into buffer (starting at cursor)
     void partitionRead(char *buffer, std::streamsize size);
 
