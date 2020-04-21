@@ -387,3 +387,6 @@ void vdi::partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direct
     // seek to desired offset
     VDI_file.seekg(position);
 }
+// sets the values in the superblock struct
+void vdi::setSuperblock() {
+}

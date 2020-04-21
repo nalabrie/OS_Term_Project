@@ -53,6 +53,9 @@ public:
 
     // structure of the VDI superblock
     struct superblock {
+        unsigned int inodeCount, blockCount, reservedBlockCount, freeBlockCount, freeInodeCount, firstDataBlock,
+                logBlockSize, logFragmentSize, blocksPerGroup, fragmentsPerGroup, inodesPerGroup, magicNumber, state,
+                firstInodeNumber, inodeSize, blockSize, blockGroupCount;
     } superblock;
 
     // path of the opened VDI file
