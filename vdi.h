@@ -46,17 +46,21 @@ public:
         unsigned int imageType, offsetBlocks, offsetData, sectorSize, diskSize, blockSize, blocksInHDD, blocksAllocated;
     } header;
 
-    // structure of the VDI partitions
+    // structure of the disk's partitions
     struct partitionEntry {
         unsigned int status, firstSectorCHS[3], lastSectorCHS[3], type, first_LBA_sector, LBA_sector_count;
     };
 
-    // structure of the VDI superblock
+    // structure of the disk's superblock
     struct superblock {
         unsigned int inodeCount, blockCount, reservedBlockCount, freeBlockCount, freeInodeCount, firstDataBlock,
                 logBlockSize, logFragmentSize, blocksPerGroup, fragmentsPerGroup, inodesPerGroup, magicNumber, state,
                 firstInodeNumber, inodeSize, blockSize, blockGroupCount;
     } superblock;
+
+    // structure of the disk's block group descriptor table
+    struct blockGroupDescriptorTable {
+    } blockGroupDescriptorTable;
 
     // path of the opened VDI file
     const char *filePath;
@@ -113,6 +117,25 @@ public:
     // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
     // (beg = start of opened partition, cur = current cursor position, end = end of opened partition)
     void partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direction);
+
+    // read the block indicated by 'blockNum' into the buffer
+    void fetchBlock(char *buffer, unsigned int blockNum);
+
+    // write the contents of the buffer into the block indicated by 'blockNum'
+    void writeBlock(const char *buffer, unsigned int blockNum);
+
+    // read the superblock into the supplied structure at the specified block number
+    void fetchSuperblock(struct superblock *sb, unsigned int blockNum);
+
+    // write the supplied superblock structure into the superblock at the specified block number
+    void writeSuperblock(const struct superblock *sb, unsigned int blockNum);
+
+    // read the block group descriptor table into the supplied structure at the specified block number
+    void fetchBGDT(struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
+
+    // write the supplied block group descriptor table structure into the block group descriptor table
+    // at the specified block number
+    void writeBGDT(const struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
 };
 
 
