@@ -482,18 +482,18 @@ void vdi::writeBlock(const char *buffer, unsigned int blockNum) {
 }
 
 // read the superblock into the supplied structure at the specified block number
-void vdi::fetchSuperblock(struct vdi::superblock *sb, unsigned int blockNum) {
+void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
 }
 
 // write the supplied superblock structure into the superblock at the specified block number
-void vdi::writeSuperblock(const struct vdi::superblock *sb, unsigned int blockNum) {
+void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNum) {
 }
 
 // read the block group descriptor table into the supplied structure at the specified block number
-void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
+void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable &bgdt, unsigned int blockNum) {
 }
 
 // write the supplied block group descriptor table structure into the block group descriptor table
 // at the specified block number
-void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
+void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable &bgdt, unsigned int blockNum) {
 }

@@ -125,17 +125,17 @@ public:
     void writeBlock(const char *buffer, unsigned int blockNum);
 
     // read the superblock into the supplied structure at the specified block number
-    void fetchSuperblock(struct superblock *sb, unsigned int blockNum);
+    void fetchSuperblock(struct superblock &sb, unsigned int blockNum);
 
     // write the supplied superblock structure into the superblock at the specified block number
-    void writeSuperblock(const struct superblock *sb, unsigned int blockNum);
+    void writeSuperblock(const struct superblock &sb, unsigned int blockNum);
 
     // read the block group descriptor table into the supplied structure at the specified block number
-    void fetchBGDT(struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
+    void fetchBGDT(struct blockGroupDescriptorTable &bgdt, unsigned int blockNum);
 
     // write the supplied block group descriptor table structure into the block group descriptor table
     // at the specified block number
-    void writeBGDT(const struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
+    void writeBGDT(const struct blockGroupDescriptorTable &bgdt, unsigned int blockNum);
 };
 
 
