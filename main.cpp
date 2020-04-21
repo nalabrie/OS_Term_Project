@@ -25,9 +25,6 @@ int main(int argc, char **argv) {
 //    vdi::printBuffer(buffer, size);
 
     struct vdi::superblock a{};
-    cout << a.state << endl;
-    file.fetchSuperblock(a, 0);
-    cout << a.state << endl;
 
     // note: superblock is offsetData + blockSize + 1024, aka 0x300400
 

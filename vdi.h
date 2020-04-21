@@ -118,10 +118,11 @@ public:
     // (beg = start of opened partition, cur = current cursor position, end = end of opened partition)
     void partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direction);
 
-    // read the block indicated by 'blockNum' into the buffer
+    // read the block indicated by 'blockNum' into the buffer (buffer must be at least size 'superblock.blockSize')
     void fetchBlock(char *buffer, unsigned int blockNum);
 
     // write the contents of the buffer into the block indicated by 'blockNum'
+    // (buffer cannot be bigger than 'superblock.blockSize')
     void writeBlock(const char *buffer, unsigned int blockNum);
 
     // read the superblock into the supplied structure at the specified block number

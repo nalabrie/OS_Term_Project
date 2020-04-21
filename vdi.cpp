@@ -450,6 +450,11 @@ void vdi::setSuperblock() {
     partitionRead(buffer, 2);
     superblock.magicNumber = littleEndianToInt(buffer, 2);
 
+    // check that the magic number is correct
+    if (superblock.magicNumber != 0xef53) {
+        throw std::runtime_error("invalid ext2 superblock (magic number does not match)");
+    }
+
     // get state
     partitionRead(buffer, 2);
     superblock.state = littleEndianToInt(buffer, 2);
@@ -473,11 +478,12 @@ void vdi::setSuperblock() {
     partitionClose();
 }
 
-// read the block indicated by 'blockNum' into the buffer
+// read the block indicated by 'blockNum' into the buffer (buffer must be at least size 'superblock.blockSize')
 void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
 }
 
 // write the contents of the buffer into the block indicated by 'blockNum'
+// (buffer cannot be bigger than 'superblock.blockSize')
 void vdi::writeBlock(const char *buffer, unsigned int blockNum) {
 }
 
