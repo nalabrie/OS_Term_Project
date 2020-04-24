@@ -495,8 +495,7 @@ void vdi::setSuperblock() {
 // read the block indicated by 'blockNum' into the buffer (buffer must be at least size 'superblock.blockSize')
 void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
     // set file cursor to the start of the desired block
-    seek((blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize),
-                  std::ios::beg);
+    seek((blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize));
 
     // read block into buffer
     read(buffer, superblock.blockSize);
@@ -506,8 +505,7 @@ void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
 // (buffer cannot be bigger than 'superblock.blockSize')
 void vdi::writeBlock(const char *buffer, unsigned int blockNum) {
     // set file cursor to the start of the desired block
-    seek((blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize),
-                  std::ios::beg);
+    seek((blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize));
 
     // write buffer into block
     write(buffer, superblock.blockSize);
