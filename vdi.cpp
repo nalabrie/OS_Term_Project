@@ -486,7 +486,8 @@ void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
     }
 
     // set file cursor to the start of the desired block
-    partitionSeek(blockNum * superblock.blockSize, std::ios::beg);
+    partitionSeek((blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize),
+                  std::ios::beg);
 
     // read block into buffer
     partitionRead(buffer, superblock.blockSize);
@@ -501,7 +502,8 @@ void vdi::writeBlock(const char *buffer, unsigned int blockNum) {
     }
 
     // set file cursor to the start of the desired block
-    partitionSeek(blockNum * superblock.blockSize, std::ios::beg);
+    partitionSeek((blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize),
+                  std::ios::beg);
 
     // write buffer into block
     partitionWrite(buffer, superblock.blockSize);
