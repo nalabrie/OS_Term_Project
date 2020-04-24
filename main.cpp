@@ -27,8 +27,9 @@ int main(int argc, char **argv) {
     struct vdi::superblock a{};
 
 //    file.partitionOpen(1);
-//    file.fetchBlock(buffer, (0xb00000 - 0x300400) / file.superblock.blockSize);
-//    vdi::printBuffer(buffer, size);
+//    file.fetchBlock(buffer, 0);
+    file.fetchBlock(buffer, (0xb00000 - 0x300400) / file.superblock.blockSize);
+    vdi::printBuffer(buffer, size);
 
     // note: superblock is offsetData + blockSize + 1024, aka 0x300400
 
