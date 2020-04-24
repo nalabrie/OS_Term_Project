@@ -16,7 +16,10 @@ private:
     std::fstream VDI_file;
 
     // size of the VDI file (0 = file not opened)
-    int fileSize = 0;
+    unsigned int fileSize = 0;
+
+    // the starting location of the VDI's disk (0 = not yet set)
+    unsigned int diskStart = 0;
 
     // the currently opened partition number (0 = no opened partition)
     int openedPartition = 0;
@@ -75,7 +78,6 @@ public:
 
     /* METHODS */
 
-    // TODO: read, write, and both versions of seek might not ever be used
     // TODO: read, write, and both versions of seek don't ensure file start/end bounds are respected
 
     // read 'size' amount bytes from VDI into buffer (starting at cursor)
@@ -84,10 +86,11 @@ public:
     // write 'size' amount bytes from 'buffer' to VDI (starting at cursor)
     void write(const char *buffer, std::streamsize size);
 
-    // sets the position of the file cursor to byte 'position'
+    // sets the position of the file cursor to byte 'position' inside the virtual disk
     void seek(std::ios::pos_type position);
 
     // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
+    // (beg = start of the VDI's disk space, cur = current cursor position, end = end of opened VDI file)
     void seek(std::ios::off_type offset, std::ios_base::seekdir direction);
 
     // gets the position of the cursor within the VDI file

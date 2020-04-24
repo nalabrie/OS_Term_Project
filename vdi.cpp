@@ -25,6 +25,11 @@ vdi::vdi(const char *filePath) : filePath(filePath) {
     VDI_file.seekg(0, std::ios::end);
     fileSize = VDI_file.tellg();
 
+    // get the start location of the virtual disk
+    partitionOpen(1);
+    diskStart = openedPartitionStart;
+    partitionClose();
+
     // reset file cursor
     VDI_file.seekg(0);
 
@@ -50,15 +55,24 @@ void vdi::write(const char *buffer, std::streamsize size) {
     VDI_file.clear();
 }
 
-// sets the position of the file cursor to byte 'position'
+// sets the position of the file cursor to byte 'position' inside the virtual disk
 void vdi::seek(std::ios::pos_type position) {
+    // offset position to start at the beginning of the disk
+    position += diskStart;
+
     // forward parameters to the builtin 'fstream' method
     VDI_file.seekg(position);
 }
 
 // offsets the file cursor by 'offset' starting from 'direction' (beg, cur, end)
-// (beg = start of opened VDI file, cur = current cursor position, end = end of opened VDI file)
+// (beg = start of the VDI's disk space, cur = current cursor position, end = end of opened VDI file)
 void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
+    // if the user wants to start at the beginning of the disk
+    if (direction == std::ios::beg) {
+        // offset position to start at the beginning of the disk
+        offset += diskStart;
+    }
+
     // forward parameters to the builtin 'fstream' method
     VDI_file.seekg(offset, direction);
 }
