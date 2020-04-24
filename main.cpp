@@ -28,8 +28,15 @@ int main(int argc, char **argv) {
 
 //    file.partitionOpen(1);
 //    file.fetchBlock(buffer, 0);
-    file.fetchBlock(buffer, (0xb00000 - 0x300400) / file.superblock.blockSize);
-    vdi::printBuffer(buffer, size);
+//    file.fetchBlock(buffer, (0xb00000 - 0x300400) / file.superblock.blockSize);
+//    vdi::printBuffer(buffer, size);
+
+//    file.fetchSuperblock(a, 5);  // fail
+//    file.fetchSuperblock(a, (0xb00000 - 0x300400) / file.superblock.blockSize);  // work
+//    file.fetchSuperblock(a, 0);  // work
+//    file.writeSuperblock(a, (0xb00000 - 0x300400) / file.superblock.blockSize);  // work
+//    file.writeSuperblock(a, 0);  // work
+//    file.writeSuperblock(a, 5);  // fail
 
     // note: superblock is offsetData + blockSize + 1024, aka 0x300400
 
@@ -64,25 +71,25 @@ int main(int argc, char **argv) {
 //        cout << "LBA_sector_count: " << file.partitionTable[i].LBA_sector_count << endl << endl;
 //    }
 
-//    cout << endl << "SUPERBLOCK" << endl << endl;
-//
-//    cout << "number of inodes: " << file.superblock.inodeCount << endl;
-//    cout << "number of blocks: " << file.superblock.blockCount << endl;
-//    cout << "number of reserved blocks: " << file.superblock.reservedBlockCount << endl;
-//    cout << "number of free blocks: " << file.superblock.freeBlockCount << endl;
-//    cout << "number of free inodes: " << file.superblock.freeInodeCount << endl;
-//    cout << "first data block: " << file.superblock.firstDataBlock << endl;
-//    cout << "log block size: " << file.superblock.logBlockSize << endl;
-//    cout << "log fragment size: " << file.superblock.logFragmentSize << endl;
-//    cout << "blocks per group: " << file.superblock.blocksPerGroup << endl;
-//    cout << "fragments per group: " << file.superblock.fragmentsPerGroup << endl;
-//    cout << "inodes per group: " << file.superblock.inodesPerGroup << endl;
-//    cout << "magic number: 0x" << hex << file.superblock.magicNumber << dec << endl;
-//    cout << "state: " << file.superblock.state << endl;
-//    cout << "first inode number: " << file.superblock.firstInodeNumber << endl;
-//    cout << "inode size: " << file.superblock.inodeSize << endl;
-//    cout << "block size: " << file.superblock.blockSize << endl;
-//    cout << "block group count: " << file.superblock.blockGroupCount << endl;
+    cout << endl << "SUPERBLOCK" << endl << endl;
+
+    cout << "number of inodes: " << file.superblock.inodeCount << endl;
+    cout << "number of blocks: " << file.superblock.blockCount << endl;
+    cout << "number of reserved blocks: " << file.superblock.reservedBlockCount << endl;
+    cout << "number of free blocks: " << file.superblock.freeBlockCount << endl;
+    cout << "number of free inodes: " << file.superblock.freeInodeCount << endl;
+    cout << "first data block: " << file.superblock.firstDataBlock << endl;
+    cout << "log block size: " << file.superblock.logBlockSize << endl;
+    cout << "log fragment size: " << file.superblock.logFragmentSize << endl;
+    cout << "blocks per group: " << file.superblock.blocksPerGroup << endl;
+    cout << "fragments per group: " << file.superblock.fragmentsPerGroup << endl;
+    cout << "inodes per group: " << file.superblock.inodesPerGroup << endl;
+    cout << "magic number: 0x" << hex << file.superblock.magicNumber << dec << endl;
+    cout << "state: " << file.superblock.state << endl;
+    cout << "first inode number: " << file.superblock.firstInodeNumber << endl;
+    cout << "inode size: " << file.superblock.inodeSize << endl;
+    cout << "block size: " << file.superblock.blockSize << endl;
+    cout << "block group count: " << file.superblock.blockGroupCount << endl;
 
     return 0;
 }

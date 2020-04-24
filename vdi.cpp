@@ -513,10 +513,110 @@ void vdi::writeBlock(const char *buffer, unsigned int blockNum) {
 
 // read the superblock into the supplied structure at the specified block number
 void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
+    // temporary buffer for reading in superblock values
+    char buffer[4];
+
+    // calculate the start of the desired block
+    unsigned int blockStart = (blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize);
+    if (blockNum == 0 && superblock.firstDataBlock == 0) {
+        // attempting to get main superblock of non-1kb system
+        // move block start another kb to reach superblock start
+        blockStart += 1024;
+    }
+
+    // skip file cursor to the magic number (for error checking)
+    seek(blockStart + 56);
+
+    // get magic number
+    read(buffer, 2);
+    sb.magicNumber = littleEndianToInt(buffer, 2);
+
+    // check that the magic number is correct
+    if (sb.magicNumber != superblock.magicNumber) {
+        throw std::runtime_error(
+                "cannot fetch superblock, block does not contain a superblock (magic number does not match)");
+    }
+
+    // move cursor back to the start of the block
+    seek(blockStart);
+
+    // get inode count
+    read(buffer, 4);
+    sb.inodeCount = littleEndianToInt(buffer, 4);
+
+    // get block count
+    read(buffer, 4);
+    sb.blockCount = littleEndianToInt(buffer, 4);
+
+    // get reserved block count
+    read(buffer, 4);
+    sb.reservedBlockCount = littleEndianToInt(buffer, 4);
+
+    // get free block count
+    read(buffer, 4);
+    sb.freeBlockCount = littleEndianToInt(buffer, 4);
+
+    // get free inode count
+    read(buffer, 4);
+    sb.freeInodeCount = littleEndianToInt(buffer, 4);
+
+    // get first data block
+    read(buffer, 4);
+    sb.firstDataBlock = littleEndianToInt(buffer, 4);
+
+    // get log block size
+    read(buffer, 4);
+    sb.logBlockSize = littleEndianToInt(buffer, 4);
+
+    // get log fragment size
+    read(buffer, 4);
+    sb.logFragmentSize = littleEndianToInt(buffer, 4);
+
+    // get blocks per group
+    read(buffer, 4);
+    sb.blocksPerGroup = littleEndianToInt(buffer, 4);
+
+    // get fragments per group
+    read(buffer, 4);
+    sb.fragmentsPerGroup = littleEndianToInt(buffer, 4);
+
+    // get inodes per group
+    read(buffer, 4);
+    sb.inodesPerGroup = littleEndianToInt(buffer, 4);
+
+    // magic number already read, skip to state
+    seek(14, std::ios::cur);
+
+    // get state
+    read(buffer, 2);
+    sb.state = littleEndianToInt(buffer, 2);
+
+    // get first inode number
+    seek(24, std::ios::cur);
+    read(buffer, 4);
+    sb.firstInodeNumber = littleEndianToInt(buffer, 4);
+
+    // get inode size
+    read(buffer, 2);
+    sb.inodeSize = littleEndianToInt(buffer, 2);
+
+    // get block size
+    sb.blockSize = (unsigned int) 1024 << sb.logBlockSize;
+
+    // get block group count
+    sb.blockGroupCount = ceil((double) sb.blockCount / (double) sb.blocksPerGroup);
 }
 
 // write the supplied superblock structure into the superblock at the specified block number
 void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNum) {
+    // try fetching the superblock to check that a superblock already exists at this block number
+    try {
+        struct superblock temp{};
+        fetchSuperblock(temp, blockNum);
+    } catch (const std::runtime_error &) {
+        throw std::runtime_error(
+                "cannot write superblock, block does not contain a superblock (magic number does not match)");
+    }
 }
 
 // read the block group descriptor table into the supplied structure at the specified block number
