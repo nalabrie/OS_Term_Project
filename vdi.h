@@ -102,6 +102,10 @@ public:
     // converts the given character buffer from little endian to a single int ('size' = length of buffer)
     static int littleEndianToInt(const char *buffer, int size);
 
+    // converts an int to a hex in little endian format and places the result into a character buffer
+    // (buffer size of 4 will hold the full int, less than 4 will truncate)
+    static void intToLittleEndianHex(char *buffer, unsigned int bufferSize, unsigned int num);
+
     // open a partition by its number (1-4)
     void partitionOpen(int number);
 

@@ -171,6 +171,33 @@ int vdi::littleEndianToInt(const char *buffer, int size) {
     return result;
 }
 
+// converts an int to a hex in little endian format and places the result into a character buffer
+// (buffer size of 4 will hold the full int, less than 4 will truncate)
+void vdi::intToLittleEndianHex(char *buffer, unsigned int bufferSize, unsigned int num) {
+    // check that the buffer size is between 1 and 4
+    if (bufferSize < 1 || bufferSize > 4) {
+        throw std::invalid_argument("buffer size must be between 1 and 4");
+    }
+
+    // convert the number depending on the 'bufferSize'
+
+    if (bufferSize >= 1) {
+        buffer[0] = static_cast<char>(num & 0xFF);
+    }
+
+    if (bufferSize >= 2) {
+        buffer[1] = static_cast<char>((num >> 8) & 0xFF);
+    }
+
+    if (bufferSize >= 3) {
+        buffer[2] = static_cast<char>((num >> 16) & 0xFF);
+    }
+
+    if (bufferSize == 4) {
+        buffer[3] = static_cast<char>((num >> 24) & 0xFF);
+    }
+}
+
 // sets the values in the header struct
 void vdi::setHeader() {
     // temporary buffer for reading in header values
@@ -617,6 +644,82 @@ void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNu
         throw std::runtime_error(
                 "cannot write superblock, block does not contain a superblock (magic number does not match)");
     }
+
+    // calculate the start of the desired block
+    unsigned int blockStart = (blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize);
+    if (blockNum == 0 && superblock.firstDataBlock == 0) {
+        // attempting to get main superblock of non-1kb system
+        // move block start another kb to reach superblock start
+        blockStart += 1024;
+    }
+
+    // move cursor to the start of the block
+    seek(blockStart);
+
+    // temporary buffer for holding converted superblock values
+    char buffer[4];
+
+    // write inode count
+    intToLittleEndianHex(buffer, 4, sb.inodeCount);
+    write(buffer, 4);
+
+    // write block count
+    intToLittleEndianHex(buffer, 4, sb.blockCount);
+    write(buffer, 4);
+
+    // write reserved block count
+    intToLittleEndianHex(buffer, 4, sb.reservedBlockCount);
+    write(buffer, 4);
+
+    // write free block count
+    intToLittleEndianHex(buffer, 4, sb.freeBlockCount);
+    write(buffer, 4);
+
+    // write free inode count
+    intToLittleEndianHex(buffer, 4, sb.freeInodeCount);
+    write(buffer, 4);
+
+    // write first data block
+    intToLittleEndianHex(buffer, 4, sb.firstDataBlock);
+    write(buffer, 4);
+
+    // write log block size
+    intToLittleEndianHex(buffer, 4, sb.logBlockSize);
+    write(buffer, 4);
+
+    // write log fragment size
+    intToLittleEndianHex(buffer, 4, sb.logFragmentSize);
+    write(buffer, 4);
+
+    // write blocks per group
+    intToLittleEndianHex(buffer, 4, sb.blocksPerGroup);
+    write(buffer, 4);
+
+    // write fragments per group
+    intToLittleEndianHex(buffer, 4, sb.fragmentsPerGroup);
+    write(buffer, 4);
+
+    // write inodes per group
+    intToLittleEndianHex(buffer, 4, sb.inodesPerGroup);
+    write(buffer, 4);
+
+    // write magic number
+    seek(12, std::ios::cur);
+    intToLittleEndianHex(buffer, 2, sb.magicNumber);
+    write(buffer, 2);
+
+    // write state
+    intToLittleEndianHex(buffer, 2, sb.state);
+    write(buffer, 2);
+
+    // write first inode number
+    seek(24, std::ios::cur);
+    intToLittleEndianHex(buffer, 4, sb.firstInodeNumber);
+    write(buffer, 4);
+
+    // write inode size
+    intToLittleEndianHex(buffer, 2, sb.inodeSize);
+    write(buffer, 2);
 }
 
 // read the block group descriptor table into the supplied structure at the specified block number
