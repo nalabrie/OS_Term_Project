@@ -41,6 +41,9 @@ private:
     // sets the values in the superblock struct
     void setSuperblock();
 
+    // get the VDI file's byte location of the desired block number
+    unsigned int locateBlock(unsigned int blockNum) const;
+
 public:
     /* VARIABLES */
 
@@ -63,6 +66,7 @@ public:
 
     // structure of the disk's block group descriptor table
     struct blockGroupDescriptorTable {
+        unsigned int blockBitmap, inodeBitmap, inodeTable, freeBlocksCount, freeInodesCount, usedDirsCount;
     } blockGroupDescriptorTable;
 
     // path of the opened VDI file

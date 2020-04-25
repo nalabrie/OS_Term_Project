@@ -519,10 +519,15 @@ void vdi::setSuperblock() {
     partitionClose();
 }
 
+// get the VDI file's byte location of the desired block number
+unsigned int vdi::locateBlock(unsigned int blockNum) const {
+    return (blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize);
+}
+
 // read the block indicated by 'blockNum' into the buffer (buffer must be at least size 'superblock.blockSize')
 void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
     // set file cursor to the start of the desired block
-    seek((blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize));
+    seek(locateBlock(blockNum));
 
     // read block into buffer
     read(buffer, superblock.blockSize);
@@ -532,7 +537,7 @@ void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
 // (buffer cannot be bigger than 'superblock.blockSize')
 void vdi::writeBlock(const char *buffer, unsigned int blockNum) {
     // set file cursor to the start of the desired block
-    seek((blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize));
+    seek(locateBlock(blockNum));
 
     // write buffer into block
     write(buffer, superblock.blockSize);
@@ -544,7 +549,7 @@ void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
     char buffer[4];
 
     // calculate the start of the desired block
-    unsigned int blockStart = (blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize);
+    unsigned int blockStart = locateBlock(blockNum);
     if (blockNum == 0 && superblock.firstDataBlock == 0) {
         // attempting to get main superblock of non-1kb system
         // move block start another kb to reach superblock start
@@ -646,7 +651,7 @@ void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNu
     }
 
     // calculate the start of the desired block
-    unsigned int blockStart = (blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize);
+    unsigned int blockStart = locateBlock(blockNum);
     if (blockNum == 0 && superblock.firstDataBlock == 0) {
         // attempting to get main superblock of non-1kb system
         // move block start another kb to reach superblock start
@@ -724,6 +729,11 @@ void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNu
 
 // read the block group descriptor table into the supplied structure at the specified block number
 void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable &bgdt, unsigned int blockNum) {
+    // temporary buffer for reading in BGDT values
+    char buffer[4];
+
+    // calculate the start of the desired block
+    unsigned int blockStart = locateBlock(blockNum);
 }
 
 // write the supplied block group descriptor table structure into the block group descriptor table

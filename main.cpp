@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 
     /* TESTING */
 
-    static const unsigned int size = 4;
+    static const unsigned int size = file.superblock.blockSize;
     char buffer[size];
 
 //    file.seek(file.header.offsetData + 0x1be);  // partition table
@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 //    cout << a << endl;
 //    vdi::printBuffer(buffer, size);
 
-    struct vdi::superblock a{};
+//    struct vdi::superblock a{};
 
 //    file.partitionOpen(1);
 //    file.fetchBlock(buffer, 0);
@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 //    file.fetchSuperblock(a, 0);  // work
 //    file.writeSuperblock(a, 5);  // fail
 
-    // write test
+    // write tests
 
 //    file.seek(1024);
 //    file.read(buffer, size);
@@ -65,6 +65,20 @@ int main(int argc, char **argv) {
 //    a.blockGroupCount = 22;  // does nothing (based on a calculation)
 //
 //    file.writeSuperblock(a, 0);
+
+    // BGDT tests
+
+    struct vdi::blockGroupDescriptorTable b{};
+
+    cout << "block 0" << endl;
+    file.fetchBlock(buffer, 0);
+    vdi::printBuffer(buffer, size);
+    cout << "block 1" << endl;  // always contains BGDT
+    file.fetchBlock(buffer, 1);
+    vdi::printBuffer(buffer, size);
+    cout << "block 2" << endl;
+    file.fetchBlock(buffer, 2);
+    vdi::printBuffer(buffer, size);
 
     /* DEBUG OUTPUT */
 
@@ -96,7 +110,7 @@ int main(int argc, char **argv) {
 //        cout << "first_LBA_sector: " << file.partitionTable[i].first_LBA_sector << endl;
 //        cout << "LBA_sector_count: " << file.partitionTable[i].LBA_sector_count << endl << endl;
 //    }
-
+//
 //    cout << endl << "SUPERBLOCK" << endl << endl;
 //
 //    cout << "number of inodes: " << file.superblock.inodeCount << endl;
