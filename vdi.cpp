@@ -734,6 +734,33 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable &bgdt, unsigned int bl
 
     // calculate the start of the desired block
     unsigned int blockStart = locateBlock(blockNum);
+
+    // move cursor back to the start of the block
+    seek(blockStart);
+
+    // get block bitmap
+    read(buffer, 4);
+    bgdt.blockBitmap = littleEndianToInt(buffer, 4);
+
+    // get inode bitmap
+    read(buffer, 4);
+    bgdt.inodeBitmap = littleEndianToInt(buffer, 4);
+
+    // get inode table
+    read(buffer, 4);
+    bgdt.inodeTable = littleEndianToInt(buffer, 4);
+
+    // get free blocks count
+    read(buffer, 2);
+    bgdt.freeBlocksCount = littleEndianToInt(buffer, 2);
+
+    // get free inodes count
+    read(buffer, 2);
+    bgdt.freeInodesCount = littleEndianToInt(buffer, 2);
+
+    // get used directories count
+    read(buffer, 2);
+    bgdt.usedDirsCount = littleEndianToInt(buffer, 2);
 }
 
 // write the supplied block group descriptor table structure into the block group descriptor table

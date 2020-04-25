@@ -70,15 +70,21 @@ int main(int argc, char **argv) {
 
     struct vdi::blockGroupDescriptorTable b{};
 
-    cout << "block 0" << endl;
-    file.fetchBlock(buffer, 0);
-    vdi::printBuffer(buffer, size);
-    cout << "block 1" << endl;  // always contains BGDT
-    file.fetchBlock(buffer, 1);
-    vdi::printBuffer(buffer, size);
-    cout << "block 2" << endl;
-    file.fetchBlock(buffer, 2);
-    vdi::printBuffer(buffer, size);
+//    cout << "block 0" << endl;
+//    file.fetchBlock(buffer, 0);
+//    vdi::printBuffer(buffer, size);
+//    cout << "block 1" << endl;  // always contains main BGDT
+//    file.fetchBlock(buffer, 1);
+//    vdi::printBuffer(buffer, size);
+
+    file.fetchBGDT(b, 1);
+
+    cout << b.blockBitmap << endl;
+    cout << b.inodeBitmap << endl;
+    cout << b.inodeTable << endl;
+    cout << b.freeBlocksCount << endl;
+    cout << b.freeInodesCount << endl;
+    cout << b.usedDirsCount << endl;
 
     /* DEBUG OUTPUT */
 
