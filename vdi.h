@@ -105,7 +105,7 @@ public:
     std::ios::pos_type cursor();
 
     // prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
-    static void printBuffer(const char *buffer, int size);
+    static void printBuffer(const char *buffer, unsigned int size);
 
     // converts the given character buffer from little endian to a single int ('size' = length of buffer)
     static int littleEndianToInt(const char *buffer, int size);

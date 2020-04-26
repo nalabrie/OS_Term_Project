@@ -87,7 +87,7 @@ std::ios::pos_type vdi::cursor() {
 }
 
 // prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
-void vdi::printBuffer(const char *buffer, int size) {
+void vdi::printBuffer(const char *buffer, unsigned int size) {
     // save existing cout settings (to restore later)
     std::ios_base::fmtflags oldFlags(std::cout.flags());
 
@@ -134,7 +134,7 @@ void vdi::printBuffer(const char *buffer, int size) {
     std::cout << "   ";
 
     // loop through the remainder of the buffer to print the final line of text
-    for (int i = size - (size - (size % 16) == size ? 16 : size % 16); i < size; ++i) {
+    for (unsigned int i = size - (size - (size % 16) == size ? 16 : size % 16); i < size; ++i) {
         if ((int) buffer[i] >= 32 && (int) buffer[i] <= 126) {
             // only print readable characters
             std::cout << buffer[i];
