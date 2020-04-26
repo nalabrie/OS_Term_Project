@@ -77,14 +77,22 @@ int main(int argc, char **argv) {
 //    file.fetchBlock(buffer, 1);
 //    vdi::printBuffer(buffer, size);
 
-    file.fetchBGDT(b, 1);
+//    cout << b.blockBitmap << endl;
+//    cout << b.inodeBitmap << endl;
+//    cout << b.inodeTable << endl;
+//    cout << b.freeBlocksCount << endl;
+//    cout << b.freeInodesCount << endl;
+//    cout << b.usedDirsCount << endl;
 
-    cout << b.blockBitmap << endl;
-    cout << b.inodeBitmap << endl;
-    cout << b.inodeTable << endl;
-    cout << b.freeBlocksCount << endl;
-    cout << b.freeInodesCount << endl;
-    cout << b.usedDirsCount << endl;
+    for (int i = 0; i < file.superblock.blockGroupCount; ++i) {
+        cout << "row " << i << ":" << endl;
+        cout << file.blockGroupDescriptorTable[i].blockBitmap << endl;
+        cout << file.blockGroupDescriptorTable[i].inodeBitmap << endl;
+        cout << file.blockGroupDescriptorTable[i].inodeTable << endl;
+        cout << file.blockGroupDescriptorTable[i].freeBlocksCount << endl;
+        cout << file.blockGroupDescriptorTable[i].freeInodesCount << endl;
+        cout << file.blockGroupDescriptorTable[i].usedDirsCount << endl;
+    }
 
     /* DEBUG OUTPUT */
 

@@ -30,6 +30,10 @@ vdi::vdi(const char *filePath) : filePath(filePath) {
     diskStart = openedPartitionStart;
     partitionClose();
 
+    // fill out the block group descriptor table struct with the opened file
+    blockGroupDescriptorTable = std::make_unique<struct blockGroupDescriptorTable[]>(superblock.blockGroupCount);
+    fetchBGDT(blockGroupDescriptorTable.get(), 1);
+
     // reset file cursor
     VDI_file.seekg(0);
 
@@ -728,7 +732,7 @@ void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNu
 }
 
 // read the block group descriptor table into the supplied structure at the specified block number
-void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable &bgdt, unsigned int blockNum) {
+void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
     // temporary buffer for reading in BGDT values
     char buffer[4];
 
@@ -740,30 +744,30 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable &bgdt, unsigned int bl
 
     // get block bitmap
     read(buffer, 4);
-    bgdt.blockBitmap = littleEndianToInt(buffer, 4);
+    bgdt[0].blockBitmap = littleEndianToInt(buffer, 4);
 
     // get inode bitmap
     read(buffer, 4);
-    bgdt.inodeBitmap = littleEndianToInt(buffer, 4);
+    bgdt[0].inodeBitmap = littleEndianToInt(buffer, 4);
 
     // get inode table
     read(buffer, 4);
-    bgdt.inodeTable = littleEndianToInt(buffer, 4);
+    bgdt[0].inodeTable = littleEndianToInt(buffer, 4);
 
     // get free blocks count
     read(buffer, 2);
-    bgdt.freeBlocksCount = littleEndianToInt(buffer, 2);
+    bgdt[0].freeBlocksCount = littleEndianToInt(buffer, 2);
 
     // get free inodes count
     read(buffer, 2);
-    bgdt.freeInodesCount = littleEndianToInt(buffer, 2);
+    bgdt[0].freeInodesCount = littleEndianToInt(buffer, 2);
 
     // get used directories count
     read(buffer, 2);
-    bgdt.usedDirsCount = littleEndianToInt(buffer, 2);
+    bgdt[0].usedDirsCount = littleEndianToInt(buffer, 2);
 }
 
 // write the supplied block group descriptor table structure into the block group descriptor table
 // at the specified block number
-void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable &bgdt, unsigned int blockNum) {
+void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
 }

@@ -55,7 +55,7 @@ public:
     // structure of the disk's partitions
     struct partitionEntry {
         unsigned int status, firstSectorCHS[3], lastSectorCHS[3], type, first_LBA_sector, LBA_sector_count;
-    };
+    } partitionTable[4];  // partition table is an array of 4 partition entries
 
     // structure of the disk's superblock
     struct superblock {
@@ -67,22 +67,20 @@ public:
     // structure of the disk's block group descriptor table
     struct blockGroupDescriptorTable {
         unsigned int blockBitmap, inodeBitmap, inodeTable, freeBlocksCount, freeInodesCount, usedDirsCount;
-    } blockGroupDescriptorTable;
+    };
+
+    // smart pointer to the BGDT array (size dynamically allocated on class construction)
+    std::unique_ptr<struct blockGroupDescriptorTable[]> blockGroupDescriptorTable;
 
     // path of the opened VDI file
     const char *filePath;
 
-    // partition table represented as an array of partition entries
-    partitionEntry partitionTable[4];
-
     /* CONSTRUCTORS */
 
     // constructor that takes path to VDI file
-    vdi(const char *filePath);
+    explicit vdi(const char *filePath);
 
     /* METHODS */
-
-    // TODO: read, write, and both versions of seek don't ensure file start/end bounds are respected
 
     // read 'size' amount bytes from VDI into buffer (starting at cursor)
     void read(char *buffer, std::streamsize size);
@@ -143,11 +141,11 @@ public:
     void writeSuperblock(const struct superblock &sb, unsigned int blockNum);
 
     // read the block group descriptor table into the supplied structure at the specified block number
-    void fetchBGDT(struct blockGroupDescriptorTable &bgdt, unsigned int blockNum);
+    void fetchBGDT(struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
 
     // write the supplied block group descriptor table structure into the block group descriptor table
     // at the specified block number
-    void writeBGDT(const struct blockGroupDescriptorTable &bgdt, unsigned int blockNum);
+    void writeBGDT(const struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
 };
 
 
