@@ -72,6 +72,12 @@ public:
     // smart pointer to the BGDT array (size dynamically allocated on class construction)
     std::unique_ptr<struct blockGroupDescriptorTable[]> blockGroupDescriptorTable;
 
+    // structure of the disk's inodes
+    struct inode {
+        unsigned int mode, uid, size, atime, ctime, mtime, dtime, gid, linksCount, blocks, flags, block[15],
+                generation, aclBlock;
+    };
+
     // path of the opened VDI file
     const char *filePath;
 
@@ -146,6 +152,21 @@ public:
     // write the supplied block group descriptor table structure into the block group descriptor table
     // at the specified block number
     void writeBGDT(const struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
+
+    // read the inode at the specified inode index into an inode structure
+    void fetchInode(struct inode &in, unsigned int iNum);
+
+    // write the given inode structure at the specified inode index
+    void writeInode(const struct inode &in, unsigned int iNum);
+
+    // checks if an inode is in use (true = in use)
+    bool inodeInUse(unsigned int iNum);
+
+    // allocate any free inode in the given group and return its inode number (group = -1 means pick any group)
+    unsigned int allocateInode(int group);
+
+    // mark the given inode as free
+    void freeInode(unsigned int iNum);
 };
 
 

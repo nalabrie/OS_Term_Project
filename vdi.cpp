@@ -7,7 +7,7 @@
 #include <cmath>
 #include "vdi.h"
 
-// default constructor, takes path to VDI file
+// only constructor, takes path to VDI file
 vdi::vdi(const char *filePath) : filePath(filePath) {
     // open the VDI file with the path given
     VDI_file.open(filePath);
@@ -814,4 +814,28 @@ void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned 
         // skip cursor to next row
         seek(14, std::ios::cur);
     }
+}
+
+// read the inode at the specified inode index into an inode structure
+void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
+}
+
+// write the given inode structure at the specified inode index
+void vdi::writeInode(const vdi::inode &in, unsigned int iNum) {
+}
+
+// checks if an inode is in use (true = in use)
+bool vdi::inodeInUse(unsigned int iNum) {
+    // not yet implemented
+    return false;
+}
+
+// allocate any free inode in the given group and return its inode number (group = -1 means pick any group)
+unsigned int vdi::allocateInode(int group) {
+    // not yet implemented
+    return 0;
+}
+
+// mark the given inode as free
+void vdi::freeInode(unsigned int iNum) {
 }
