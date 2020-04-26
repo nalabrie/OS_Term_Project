@@ -733,13 +733,22 @@ void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNu
 
 // read the block group descriptor table into the supplied structure at the specified block number
 void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
+    // check that the user is attempting to fetch a valid BGDT (try fetching the superblock at 'blockNum' - 1)
+    try {
+        struct superblock temp{};
+        fetchSuperblock(temp, blockNum - 1);
+    } catch (const std::runtime_error &) {
+        throw std::runtime_error(
+                "cannot fetch BGDT, block does not contain a BGDT (no superblock in the block before it)");
+    }
+
     // temporary buffer for reading in BGDT values
     char buffer[4];
 
     // calculate the start of the desired block
     unsigned int blockStart = locateBlock(blockNum);
 
-    // move cursor back to the start of the block
+    // move cursor to the start of the block
     seek(blockStart);
 
     // loop through each row of the table
@@ -776,6 +785,15 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int bl
 // write the supplied block group descriptor table structure into the block group descriptor table
 // at the specified block number
 void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
+    // check that the user is attempting to write to a valid BGDT (try fetching the superblock at 'blockNum' - 1)
+    try {
+        struct superblock temp{};
+        fetchSuperblock(temp, blockNum - 1);
+    } catch (const std::runtime_error &) {
+        throw std::runtime_error(
+                "cannot write BGDT, block does not contain a BGDT (no superblock in the block before it)");
+    }
+
     // temporary buffer for holding converted BGDT values
     char buffer[4];
 
@@ -818,6 +836,26 @@ void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned 
 
 // read the inode at the specified inode index into an inode structure
 void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
+    // calculate block group that the inode belongs to
+    unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
+
+    // calculate local inode index within that block group
+    unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+
+    // move cursor to the start of the desired inode
+    if (superblock.firstDataBlock == 1) {
+        seek(locateBlock(
+                blockGroupDescriptorTable[blockGroup].inodeTable - 1) + (localIndex * superblock.inodeSize));
+    } else {
+        seek(locateBlock(
+                blockGroupDescriptorTable[blockGroup].inodeTable) + (localIndex * superblock.inodeSize));
+    }
+
+    // debug output
+//    std::cout << "cursor: " << std::hex << cursor() << std::endl;
+//    char buffer[superblock.inodeSize];
+//    read(buffer, superblock.inodeSize);
+//    printBuffer(buffer, superblock.inodeSize);
 }
 
 // write the given inode structure at the specified inode index

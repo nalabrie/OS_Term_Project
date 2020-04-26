@@ -105,8 +105,23 @@ int main(int argc, char **argv) {
 
     // inode tests
 
-    file.fetchBlock(buffer, file.blockGroupDescriptorTable[0].inodeTable);
-    vdi::printBuffer(buffer, size);
+    struct vdi::inode i{};
+    file.fetchInode(i, 2);
+
+    struct vdi::blockGroupDescriptorTable BGDT_array[file.superblock.blockGroupCount];
+    for (int i = 0; i < file.superblock.blockGroupCount; ++i) {
+        BGDT_array[i] = b;
+    }
+    file.fetchBGDT(BGDT_array, (file.superblock.blocksPerGroup * 0) + 1);
+    for (int i = 0; i < file.superblock.blockGroupCount; ++i) {
+        cout << "row " << i << ":" << endl;
+        cout << BGDT_array[i].blockBitmap << endl;
+        cout << BGDT_array[i].inodeBitmap << endl;
+        cout << BGDT_array[i].inodeTable << endl;
+        cout << BGDT_array[i].freeBlocksCount << endl;
+        cout << BGDT_array[i].freeInodesCount << endl;
+        cout << BGDT_array[i].usedDirsCount << endl;
+    }
 
     /* DEBUG OUTPUT */
 
