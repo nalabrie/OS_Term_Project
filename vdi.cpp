@@ -776,4 +776,42 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int bl
 // write the supplied block group descriptor table structure into the block group descriptor table
 // at the specified block number
 void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
+    // temporary buffer for holding converted BGDT values
+    char buffer[4];
+
+    // calculate the start of the desired block
+    unsigned int blockStart = locateBlock(blockNum);
+
+    // move cursor back to the start of the block
+    seek(blockStart);
+
+    // loop through each row of the table
+    for (int i = 0; i < superblock.blockGroupCount; ++i) {
+        // get block bitmap
+        intToLittleEndianHex(buffer, 4, bgdt[i].blockBitmap);
+        write(buffer, 4);
+
+        // get inode bitmap
+        intToLittleEndianHex(buffer, 4, bgdt[i].inodeBitmap);
+        write(buffer, 4);
+
+        // get inode table
+        intToLittleEndianHex(buffer, 4, bgdt[i].inodeTable);
+        write(buffer, 4);
+
+        // get free blocks count
+        intToLittleEndianHex(buffer, 2, bgdt[i].freeBlocksCount);
+        write(buffer, 2);
+
+        // get free inodes count
+        intToLittleEndianHex(buffer, 2, bgdt[i].freeInodesCount);
+        write(buffer, 2);
+
+        // get used directories count
+        intToLittleEndianHex(buffer, 2, bgdt[i].usedDirsCount);
+        write(buffer, 2);
+
+        // skip cursor to next row
+        seek(14, std::ios::cur);
+    }
 }

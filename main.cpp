@@ -77,12 +77,20 @@ int main(int argc, char **argv) {
 //    file.fetchBlock(buffer, 1);
 //    vdi::printBuffer(buffer, size);
 
-//    cout << b.blockBitmap << endl;
-//    cout << b.inodeBitmap << endl;
-//    cout << b.inodeTable << endl;
-//    cout << b.freeBlocksCount << endl;
-//    cout << b.freeInodesCount << endl;
-//    cout << b.usedDirsCount << endl;
+//    b.blockBitmap = 12;
+//    b.inodeBitmap = 13;
+//    b.inodeTable = 14;
+//    b.freeBlocksCount = 15;
+//    b.freeInodesCount = 16;
+//    b.usedDirsCount = 17;
+
+//    struct vdi::blockGroupDescriptorTable BGDT_array[file.superblock.blockGroupCount];
+//
+//    for (int i = 0; i < file.superblock.blockGroupCount; ++i) {
+//        BGDT_array[i] = b;
+//    }
+//
+//    file.writeBGDT(BGDT_array, 1);
 
     for (int i = 0; i < file.superblock.blockGroupCount; ++i) {
         cout << "row " << i << ":" << endl;
