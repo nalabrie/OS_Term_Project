@@ -742,29 +742,35 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int bl
     // move cursor back to the start of the block
     seek(blockStart);
 
-    // get block bitmap
-    read(buffer, 4);
-    bgdt[0].blockBitmap = littleEndianToInt(buffer, 4);
+    // loop through each row of the table
+    for (int i = 0; i < superblock.blockGroupCount; ++i) {
+        // get block bitmap
+        read(buffer, 4);
+        bgdt[i].blockBitmap = littleEndianToInt(buffer, 4);
 
-    // get inode bitmap
-    read(buffer, 4);
-    bgdt[0].inodeBitmap = littleEndianToInt(buffer, 4);
+        // get inode bitmap
+        read(buffer, 4);
+        bgdt[i].inodeBitmap = littleEndianToInt(buffer, 4);
 
-    // get inode table
-    read(buffer, 4);
-    bgdt[0].inodeTable = littleEndianToInt(buffer, 4);
+        // get inode table
+        read(buffer, 4);
+        bgdt[i].inodeTable = littleEndianToInt(buffer, 4);
 
-    // get free blocks count
-    read(buffer, 2);
-    bgdt[0].freeBlocksCount = littleEndianToInt(buffer, 2);
+        // get free blocks count
+        read(buffer, 2);
+        bgdt[i].freeBlocksCount = littleEndianToInt(buffer, 2);
 
-    // get free inodes count
-    read(buffer, 2);
-    bgdt[0].freeInodesCount = littleEndianToInt(buffer, 2);
+        // get free inodes count
+        read(buffer, 2);
+        bgdt[i].freeInodesCount = littleEndianToInt(buffer, 2);
 
-    // get used directories count
-    read(buffer, 2);
-    bgdt[0].usedDirsCount = littleEndianToInt(buffer, 2);
+        // get used directories count
+        read(buffer, 2);
+        bgdt[i].usedDirsCount = littleEndianToInt(buffer, 2);
+
+        // skip cursor to next row
+        seek(14, std::ios::cur);
+    }
 }
 
 // write the supplied block group descriptor table structure into the block group descriptor table
