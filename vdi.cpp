@@ -1093,8 +1093,8 @@ void vdi::freeInode(unsigned int iNum) {
     // calculate the correct bit index of the byte
     unsigned int bitOffset = localIndex % 8;
 
-    // set the bit to 1
-    binary[bitOffset] = true;
+    // set the bit to 0
+    binary[bitOffset] = false;
 
     // convert the binary number to a little endian hex character
     intToLittleEndianHex(&byte, 1, binary.to_ulong());
