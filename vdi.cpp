@@ -851,11 +851,69 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
                 blockGroupDescriptorTable[blockGroup].inodeTable) + (localIndex * superblock.inodeSize));
     }
 
-    // debug output
-//    std::cout << "cursor: " << std::hex << cursor() << std::endl;
-//    char buffer[superblock.inodeSize];
-//    read(buffer, superblock.inodeSize);
-//    printBuffer(buffer, superblock.inodeSize);
+    // temporary buffer for reading in inode values
+    char buffer[4];
+
+    // get mode
+    read(buffer, 2);
+    in.mode = littleEndianToInt(buffer, 2);
+
+    // get user id
+    read(buffer, 2);
+    in.uid = littleEndianToInt(buffer, 2);
+
+    // get size
+    read(buffer, 4);
+    in.size = littleEndianToInt(buffer, 4);
+
+    // get accessed time
+    read(buffer, 4);
+    in.atime = littleEndianToInt(buffer, 4);
+
+    // get created time
+    read(buffer, 4);
+    in.ctime = littleEndianToInt(buffer, 4);
+
+    // get modified time
+    read(buffer, 4);
+    in.mtime = littleEndianToInt(buffer, 4);
+
+    // get deleted time
+    read(buffer, 4);
+    in.dtime = littleEndianToInt(buffer, 4);
+
+    // get group id
+    read(buffer, 2);
+    in.gid = littleEndianToInt(buffer, 2);
+
+    // get links count
+    read(buffer, 2);
+    in.linksCount = littleEndianToInt(buffer, 2);
+
+    // get 'blocks' (total number of 512-bytes blocks reserved to contain the data of this inode)
+    // note: maximum index of the 'block' array is computed with: blocks / (2 << superblock.logBlockSize)
+    read(buffer, 4);
+    in.blocks = littleEndianToInt(buffer, 4);
+
+    // get flags
+    // note: flag definition table: https://www.nongnu.org/ext2-doc/ext2.html#i-flags
+    read(buffer, 4);
+    in.flags = littleEndianToInt(buffer, 4);
+
+    // get the block array (15 4-byte values)
+    seek(4, std::ios::cur);
+    for (unsigned int &i : in.block) {
+        read(buffer, 4);
+        i = littleEndianToInt(buffer, 4);
+    }
+
+    // get file version
+    read(buffer, 4);
+    in.generation = littleEndianToInt(buffer, 4);
+
+    // get ACL block
+    read(buffer, 4);
+    in.aclBlock = littleEndianToInt(buffer, 4);
 }
 
 // write the given inode structure at the specified inode index

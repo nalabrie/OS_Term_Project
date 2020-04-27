@@ -6,9 +6,10 @@
 using namespace std;
 
 int main(int argc, char **argv) {
+    // open VDI file passed to the program as an argument
     vdi file = vdi(argv[1]);
 
-    /* TESTING */
+    /* TESTING BELOW THIS LINE */
 
     static const unsigned int size = file.superblock.blockSize;
     char buffer[size];
@@ -24,51 +25,52 @@ int main(int argc, char **argv) {
 //    cout << a << endl;
 //    vdi::printBuffer(buffer, size);
 
-//    struct vdi::superblock a{};
+    struct vdi::superblock s{};
 
 //    file.partitionOpen(1);
 //    file.fetchBlock(buffer, 0);
 //    file.fetchBlock(buffer, (0xb00000 - 0x300400) / file.superblock.blockSize);
 //    vdi::printBuffer(buffer, size);
 
-//    file.fetchSuperblock(a, 5);  // fail
-//    file.fetchSuperblock(a, (0xb00000 - 0x300400) / file.superblock.blockSize);  // work
-//    file.fetchSuperblock(a, 0);  // work
-//    file.writeSuperblock(a, 5);  // fail
+//    file.fetchSuperblock(s, 5);  // fail
+//    file.fetchSuperblock(s, (0xb00000 - 0x300400) / file.superblock.blockSize);  // work
+//    file.fetchSuperblock(s, 0);  // work
+//    file.writeSuperblock(s, 5);  // fail
 
     // write tests
 
 //    file.seek(1024);
 //    file.read(buffer, size);
 //    vdi::printBuffer(buffer, size);  // before
-//    file.writeSuperblock(a, 0);
+//    file.writeSuperblock(s, 0);
 //    file.seek(1024);
 //    file.read(buffer, size);
 //    vdi::printBuffer(buffer, size);  // after
 
-//    a.inodeCount = 12345;
-//    a.blockCount = 123456;
-//    a.reservedBlockCount = 1234;
-//    a.freeBlockCount = 54321;
-//    a.freeInodeCount = 11111;
-//    a.firstDataBlock = 1;  // must remain the same in block 0 for calculations
-//    a.logBlockSize = 0;  // must remain the same in block 0 for calculations
-//    a.logFragmentSize = 0;  // must remain the same in block 0 for calculations
-//    a.blocksPerGroup = 2222;
-//    a.fragmentsPerGroup = 3333;
-//    a.inodesPerGroup = 4444;
-//    a.magicNumber = 0xef53;  // must remain the same in block 0 for calculations
-//    a.state = 9;
-//    a.firstInodeNumber = 69;
-//    a.inodeSize = 321;
-//    a.blockSize = 5555;  // does nothing (based on a calculation)
-//    a.blockGroupCount = 22;  // does nothing (based on a calculation)
-//
-//    file.writeSuperblock(a, 0);
+//    s.inodeCount = 12345;
+//    s.blockCount = 123456;
+//    s.reservedBlockCount = 1234;
+//    s.freeBlockCount = 54321;
+//    s.freeInodeCount = 11111;
+//    s.firstDataBlock = 1;  // must remain the same in block 0 for calculations
+//    s.logBlockSize = 0;  // must remain the same in block 0 for calculations
+//    s.logFragmentSize = 0;  // must remain the same in block 0 for calculations
+//    s.blocksPerGroup = 2222;
+//    s.fragmentsPerGroup = 3333;
+//    s.inodesPerGroup = 4444;
+//    s.magicNumber = 0xef53;  // must remain the same in block 0 for calculations
+//    s.state = 9;
+//    s.firstInodeNumber = 69;
+//    s.inodeSize = 321;
+//    s.blockSize = 5555;  // does nothing (based on a calculation)
+//    s.blockGroupCount = 22;  // does nothing (based on a calculation)
+
+//    file.writeSuperblock(s, 0);
 
     // BGDT tests
 
     struct vdi::blockGroupDescriptorTable b{};
+    struct vdi::blockGroupDescriptorTable BGDT_array[file.superblock.blockGroupCount];
 
 //    cout << "block 0" << endl;
 //    file.fetchBlock(buffer, 0);
@@ -84,12 +86,10 @@ int main(int argc, char **argv) {
 //    b.freeInodesCount = 16;
 //    b.usedDirsCount = 17;
 
-//    struct vdi::blockGroupDescriptorTable BGDT_array[file.superblock.blockGroupCount];
-//
 //    for (int i = 0; i < file.superblock.blockGroupCount; ++i) {
 //        BGDT_array[i] = b;
 //    }
-//
+
 //    file.writeBGDT(BGDT_array, 1);
 
     // print main BGDT
@@ -106,24 +106,33 @@ int main(int argc, char **argv) {
     // inode tests
 
     struct vdi::inode i{};
+
     file.fetchInode(i, 2);
 
-    struct vdi::blockGroupDescriptorTable BGDT_array[file.superblock.blockGroupCount];
-    for (int i = 0; i < file.superblock.blockGroupCount; ++i) {
-        BGDT_array[i] = b;
-    }
-    file.fetchBGDT(BGDT_array, (file.superblock.blocksPerGroup * 0) + 1);
-    for (int i = 0; i < file.superblock.blockGroupCount; ++i) {
-        cout << "row " << i << ":" << endl;
-        cout << BGDT_array[i].blockBitmap << endl;
-        cout << BGDT_array[i].inodeBitmap << endl;
-        cout << BGDT_array[i].inodeTable << endl;
-        cout << BGDT_array[i].freeBlocksCount << endl;
-        cout << BGDT_array[i].freeInodesCount << endl;
-        cout << BGDT_array[i].usedDirsCount << endl;
-    }
+    time_t i_atime, i_ctime, i_mtime, i_dtime;
+    i_atime = i.atime;
+    i_ctime = i.ctime;
+    i_mtime = i.mtime;
+    i_dtime = i.dtime;
 
-    /* DEBUG OUTPUT */
+    cout << "mode: " << i.mode << endl;
+    cout << "uid: " << i.uid << endl;
+    cout << "size: " << i.size << endl;
+    cout << "atime: " << ctime(&i_atime);
+    cout << "ctime: " << ctime(&i_ctime);
+    cout << "mtime: " << ctime(&i_mtime);
+    cout << "dtime: " << ctime(&i_dtime);
+    cout << "gid: " << i.gid << endl;
+    cout << "linksCount: " << i.linksCount << endl;
+    cout << "blocks: " << i.blocks << endl;
+    cout << "flags: " << i.flags << endl;
+    for (int j = 0; j < 15; ++j) {
+        cout << "block " << j << ": " << i.block[j] << endl;
+    }
+    cout << "generation: " << i.generation << endl;
+    cout << "aclBlock: " << i.aclBlock << endl;
+
+    // header tests
 
 //    cout << hex;
 //
@@ -137,7 +146,10 @@ int main(int argc, char **argv) {
 //    cout << "blockSize: " << file.header.blockSize << endl;
 //    cout << "blocksInHDD: " << file.header.blocksInHDD << endl;
 //    cout << "blocksAllocated: " << file.header.blocksAllocated << endl;
-//
+
+
+    // partition table tests
+
 //    cout << endl << "PARTITION TABLE" << endl << endl;
 //
 //    cout << dec;
@@ -153,7 +165,9 @@ int main(int argc, char **argv) {
 //        cout << "first_LBA_sector: " << file.partitionTable[i].first_LBA_sector << endl;
 //        cout << "LBA_sector_count: " << file.partitionTable[i].LBA_sector_count << endl << endl;
 //    }
-//
+
+    // superblock tests
+
 //    cout << endl << "SUPERBLOCK" << endl << endl;
 //
 //    cout << "number of inodes: " << file.superblock.inodeCount << endl;
