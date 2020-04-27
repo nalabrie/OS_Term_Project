@@ -10,7 +10,7 @@
 // only constructor, takes path to VDI file
 vdi::vdi(const char *filePath) : filePath(filePath) {
     // open the VDI file with the path given
-    VDI_file.open(filePath);
+    VDI_file.open(filePath, std::ios::in | std::ios::out | std::ios::binary);
 
     // fill out the header struct with the opened file
     setHeader();
