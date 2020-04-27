@@ -918,6 +918,82 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
 // write the given inode structure at the specified inode index
 void vdi::writeInode(const vdi::inode &in, unsigned int iNum) {
+    // calculate block group that the inode belongs to
+    unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
+
+    // calculate local inode index within that block group
+    unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+
+    // move cursor to the start of the desired inode
+    if (superblock.firstDataBlock == 1) {
+        seek(locateBlock(
+                blockGroupDescriptorTable[blockGroup].inodeTable - 1) + (localIndex * superblock.inodeSize));
+    } else {
+        seek(locateBlock(
+                blockGroupDescriptorTable[blockGroup].inodeTable) + (localIndex * superblock.inodeSize));
+    }
+
+    // temporary buffer for holding converted inode values
+    char buffer[4];
+
+    // write mode
+    intToLittleEndianHex(buffer, 2, in.mode);
+    write(buffer, 2);
+
+    // write user id
+    intToLittleEndianHex(buffer, 2, in.uid);
+    write(buffer, 2);
+
+    // write size
+    intToLittleEndianHex(buffer, 4, in.size);
+    write(buffer, 4);
+
+    // write accessed time
+    intToLittleEndianHex(buffer, 4, in.atime);
+    write(buffer, 4);
+
+    // write created time
+    intToLittleEndianHex(buffer, 4, in.ctime);
+    write(buffer, 4);
+
+    // write modified time
+    intToLittleEndianHex(buffer, 4, in.mtime);
+    write(buffer, 4);
+
+    // write deleted time
+    intToLittleEndianHex(buffer, 4, in.dtime);
+    write(buffer, 4);
+
+    // write group id
+    intToLittleEndianHex(buffer, 2, in.gid);
+    write(buffer, 2);
+
+    // write links count
+    intToLittleEndianHex(buffer, 2, in.linksCount);
+    write(buffer, 2);
+
+    // write 'blocks' (total number of 512-bytes blocks reserved to contain the data of this inode)
+    intToLittleEndianHex(buffer, 4, in.blocks);
+    write(buffer, 4);
+
+    // write flags
+    intToLittleEndianHex(buffer, 4, in.flags);
+    write(buffer, 4);
+
+    // write the block array (15 4-byte values)
+    seek(4, std::ios::cur);
+    for (unsigned int i : in.block) {
+        intToLittleEndianHex(buffer, 4, i);
+        write(buffer, 4);
+    }
+
+    // write file version
+    intToLittleEndianHex(buffer, 4, in.generation);
+    write(buffer, 4);
+
+    // write ACL block
+    intToLittleEndianHex(buffer, 4, in.aclBlock);
+    write(buffer, 4);
 }
 
 // checks if an inode is in use (true = in use)
