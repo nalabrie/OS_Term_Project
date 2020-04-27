@@ -837,6 +837,11 @@ void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned 
 
 // read the inode at the specified inode index into an inode structure
 void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
+    // error checking
+    if (iNum == 0) {
+        throw std::invalid_argument("cannot fetch inode, inode number cannot be zero");
+    }
+
     // calculate block group that the inode belongs to
     unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
 
@@ -919,6 +924,11 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
 // write the given inode structure at the specified inode index
 void vdi::writeInode(const vdi::inode &in, unsigned int iNum) {
+    // error checking
+    if (iNum == 0) {
+        throw std::invalid_argument("cannot write inode, inode number cannot be zero");
+    }
+
     // calculate block group that the inode belongs to
     unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
 
@@ -999,6 +1009,11 @@ void vdi::writeInode(const vdi::inode &in, unsigned int iNum) {
 
 // checks if an inode is in use (true = in use)
 bool vdi::inodeInUse(unsigned int iNum) {
+    // error checking
+    if (iNum == 0) {
+        throw std::invalid_argument("cannot check if inode is in use, inode number cannot be zero");
+    }
+
     // calculate block group that the inode belongs to
     unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
 
@@ -1042,4 +1057,8 @@ unsigned int vdi::allocateInode(int group) {
 
 // mark the given inode as free
 void vdi::freeInode(unsigned int iNum) {
+    // error checking
+    if (iNum == 0) {
+        throw std::invalid_argument("cannot free inode, inode number cannot be zero");
+    }
 }
