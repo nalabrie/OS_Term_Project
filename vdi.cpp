@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <bitset>
 #include "vdi.h"
 
 // only constructor, takes path to VDI file
@@ -998,8 +999,39 @@ void vdi::writeInode(const vdi::inode &in, unsigned int iNum) {
 
 // checks if an inode is in use (true = in use)
 bool vdi::inodeInUse(unsigned int iNum) {
-    // not yet implemented
-    return false;
+    // calculate block group that the inode belongs to
+    unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
+
+    // calculate local inode index within that block group
+    unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+
+    // move file cursor to the start of the inode bitmap block for that group
+    if (superblock.firstDataBlock == 1) {
+        seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap - 1));
+    } else {
+        seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap));
+    }
+
+    // calculate which byte the desired bit is contained in
+    unsigned int byteOffset = localIndex / 8;
+
+    // move cursor that many bytes forward
+    seek(byteOffset, std::ios::cur);
+
+    // temporary buffer for holding the byte
+    char byte;
+
+    // read byte
+    read(&byte, 1);
+
+    // convert byte to 8 digit binary
+    std::bitset<8> binary(byte);
+
+    // calculate the correct bit index of the byte
+    unsigned int bitOffset = localIndex % 8;
+
+    // return the bit
+    return binary[bitOffset];
 }
 
 // allocate any free inode in the given group and return its inode number (group = -1 means pick any group)

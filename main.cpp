@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <bitset>
 #include "vdi.h"
 
 using namespace std;
@@ -107,48 +108,42 @@ int main(int argc, char **argv) {
 
     struct vdi::inode i{};
 
-//    file.seek(0x341928 - 0x300000);
-//    char c[4];
-//    c[0] = 10;
-//    c[1] = 0;
-//    c[2] = 0;
-//    c[3] = 0;
-////    vdi::intToLittleEndianHex(c, 4, 9);
-//    for (int j = 0; j < 2; ++j) {
-//        file.write(c, 1);
+//    for (int j = 1; j < 2049; ++j) {
+//        file.fetchInode(i, j);
+//        if (i.ctime != 0) {
+//            cout << j << endl;
+//        }
 //    }
 
-    file.fetchInode(i, 11);
+//    file.fetchInode(i, 1);
+//
+//    time_t i_atime, i_ctime, i_mtime, i_dtime;
+//    i_atime = i.atime;
+//    i_ctime = i.ctime;
+//    i_mtime = i.mtime;
+//    i_dtime = i.dtime;
+//
+//    cout << "mode: " << i.mode << endl;
+//    cout << "uid: " << i.uid << endl;
+//    cout << "size: " << i.size << endl;
+//    cout << "atime: " << ctime(&i_atime);
+//    cout << "ctime: " << ctime(&i_ctime);
+//    cout << "mtime: " << ctime(&i_mtime);
+//    cout << "dtime: " << ctime(&i_dtime);
+//    cout << "gid: " << i.gid << endl;
+//    cout << "linksCount: " << i.linksCount << endl;
+//    cout << "blocks: " << i.blocks << endl;
+//    cout << "flags: " << i.flags << endl;
+//    for (int j = 0; j < 15; ++j) {
+//        cout << "block " << j << ": " << i.block[j] << endl;
+//    }
+//    cout << "generation: " << i.generation << endl;
+//    cout << "aclBlock: " << i.aclBlock << endl;
 
-    for (unsigned int &k : i.block) {
-        k = 10;
+    for (int j = 1; j < 65; ++j) {
+        cout << "inode " << j << ": ";
+        cout << file.inodeInUse(j) << endl;
     }
-
-//    file.writeInode(i, 11);  // uncomment these to test writing
-//    file.fetchInode(i, 11);  // uncomment these to test writing
-
-    time_t i_atime, i_ctime, i_mtime, i_dtime;
-    i_atime = i.atime;
-    i_ctime = i.ctime;
-    i_mtime = i.mtime;
-    i_dtime = i.dtime;
-
-    cout << "mode: " << i.mode << endl;
-    cout << "uid: " << i.uid << endl;
-    cout << "size: " << i.size << endl;
-    cout << "atime: " << ctime(&i_atime);
-    cout << "ctime: " << ctime(&i_ctime);
-    cout << "mtime: " << ctime(&i_mtime);
-    cout << "dtime: " << ctime(&i_dtime);
-    cout << "gid: " << i.gid << endl;
-    cout << "linksCount: " << i.linksCount << endl;
-    cout << "blocks: " << i.blocks << endl;
-    cout << "flags: " << i.flags << endl;
-    for (int j = 0; j < 15; ++j) {
-        cout << "block " << j << ": " << i.block[j] << endl;
-    }
-    cout << "generation: " << i.generation << endl;
-    cout << "aclBlock: " << i.aclBlock << endl;
 
 //    // header tests
 //
