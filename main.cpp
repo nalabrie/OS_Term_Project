@@ -140,10 +140,10 @@ int main(int argc, char **argv) {
 //    cout << "generation: " << i.generation << endl;
 //    cout << "aclBlock: " << i.aclBlock << endl;
 
-    for (int j = 1; j < 65; ++j) {
-        cout << "inode " << j << ": ";
-        cout << file.inodeInUse(j) << endl;
-    }
+//    for (int j = 1; j < 65; ++j) {
+//        cout << "inode " << j << ": ";
+//        cout << file.inodeInUse(j) << endl;
+//    }
 
 //    // header tests
 //
