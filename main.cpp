@@ -145,6 +145,11 @@ int main(int argc, char **argv) {
 //        cout << file.inodeInUse(j) << endl;
 //    }
 
+    // file access tests
+
+    file.fetchInode(i, 12);  // arduino tarball
+    file.fetchBlockFromFile(buffer, i, 0);
+
 //    // header tests
 //
 //    cout << hex;

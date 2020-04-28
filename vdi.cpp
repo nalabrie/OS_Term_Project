@@ -1204,3 +1204,11 @@ void vdi::freeInode(unsigned int iNum) {
     // write the modified byte back to the file
     write(&byte, 1);
 }
+
+// read the file block 'bNum' into a buffer of the file represented by the supplied inode
+void vdi::fetchBlockFromFile(char *buffer, vdi::inode &in, unsigned int bNum) {
+}
+
+// write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
+void vdi::writeBlockToFile(const char *buffer, vdi::inode &in, unsigned int bNum) {
+}
