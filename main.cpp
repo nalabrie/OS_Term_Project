@@ -150,6 +150,8 @@ int main(int argc, char **argv) {
     file.fetchInode(i, 12);  // arduino tarball
     file.fetchBlockFromFile(buffer, i, 0);
 
+    vdi::printBuffer(buffer, file.superblock.blockSize);
+
 //    // header tests
 //
 //    cout << hex;

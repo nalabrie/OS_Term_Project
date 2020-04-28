@@ -849,13 +849,8 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
     unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
     // move cursor to the start of the desired inode
-    if (superblock.firstDataBlock == 1) {
-        seek(locateBlock(
-                blockGroupDescriptorTable[blockGroup].inodeTable - 1) + (localIndex * superblock.inodeSize));
-    } else {
-        seek(locateBlock(
-                blockGroupDescriptorTable[blockGroup].inodeTable) + (localIndex * superblock.inodeSize));
-    }
+    seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeTable - superblock.firstDataBlock) +
+         (localIndex * superblock.inodeSize));
 
     // temporary buffer for reading in inode values
     char buffer[4];
@@ -936,13 +931,8 @@ void vdi::writeInode(const vdi::inode &in, unsigned int iNum) {
     unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
     // move cursor to the start of the desired inode
-    if (superblock.firstDataBlock == 1) {
-        seek(locateBlock(
-                blockGroupDescriptorTable[blockGroup].inodeTable - 1) + (localIndex * superblock.inodeSize));
-    } else {
-        seek(locateBlock(
-                blockGroupDescriptorTable[blockGroup].inodeTable) + (localIndex * superblock.inodeSize));
-    }
+    seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeTable - superblock.firstDataBlock) +
+         (localIndex * superblock.inodeSize));
 
     // temporary buffer for holding converted inode values
     char buffer[4];
@@ -1021,11 +1011,7 @@ bool vdi::inodeInUse(unsigned int iNum) {
     unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
     // move file cursor to the start of the inode bitmap block for that group
-    if (superblock.firstDataBlock == 1) {
-        seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap - 1));
-    } else {
-        seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap));
-    }
+    seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap - superblock.firstDataBlock));
 
     // calculate which byte the desired bit is contained in
     unsigned int byteOffset = localIndex / 8;
@@ -1113,11 +1099,7 @@ unsigned int vdi::allocateInode(int group) {
         unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
         // move file cursor to the start of the inode bitmap block for the given group
-        if (superblock.firstDataBlock == 1) {
-            seek(locateBlock(blockGroupDescriptorTable[group].inodeBitmap - 1));
-        } else {
-            seek(locateBlock(blockGroupDescriptorTable[group].inodeBitmap));
-        }
+        seek(locateBlock(blockGroupDescriptorTable[group].inodeBitmap - superblock.firstDataBlock));
 
         // calculate which byte the desired bit is contained in
         unsigned int byteOffset = localIndex / 8;
@@ -1168,11 +1150,7 @@ void vdi::freeInode(unsigned int iNum) {
     unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
     // move file cursor to the start of the inode bitmap block for that group
-    if (superblock.firstDataBlock == 1) {
-        seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap - 1));
-    } else {
-        seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap));
-    }
+    seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap - superblock.firstDataBlock));
 
     // calculate which byte the desired bit is contained in
     unsigned int byteOffset = localIndex / 8;
@@ -1206,9 +1184,40 @@ void vdi::freeInode(unsigned int iNum) {
 }
 
 // read the file block 'bNum' into a buffer of the file represented by the supplied inode
+// (buffer must be at least size 'superblock.blockSize')
 void vdi::fetchBlockFromFile(char *buffer, vdi::inode &in, unsigned int bNum) {
+    // array length of the inode indirect blocks
+    unsigned int k = superblock.blockSize / 4;
+
+    // the disk block number that contains the file data block being requested
+    // (calculated in the following if/else)
+    unsigned int diskBlock;
+
+    if (bNum < 12) {
+        /* data block is stored in the inode block array */
+
+        // disk block number is just the block number in the inode block array at index 'bNum'
+        diskBlock = in.block[bNum];
+    } else if (bNum < 12 + k) {
+        /* data block is stored in the single indirect block */
+    } else if (bNum < 12 + k + k * k) {
+        /* data block is stored in the double indirect block */
+    } else {
+        /* data block is stored in the triple indirect block */
+    }
+
+    /* disk block number has been calculated at this point, ready for reading */
+
+    fetchBlock(buffer, diskBlock - superblock.firstDataBlock);
+
+    // move file cursor to the start of the desired block
+    seek(locateBlock(diskBlock - superblock.firstDataBlock));
+
+    // read the block
+    read(buffer, superblock.blockSize);
 }
 
 // write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
+// (buffer must be at least size 'superblock.blockSize')
 void vdi::writeBlockToFile(const char *buffer, vdi::inode &in, unsigned int bNum) {
 }
