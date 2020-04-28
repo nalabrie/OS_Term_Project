@@ -1050,9 +1050,68 @@ bool vdi::inodeInUse(unsigned int iNum) {
 }
 
 // allocate any free inode in the given group and return its inode number (group = -1 means pick any group)
+// note: a return value of -1 means an unknown error occurred
 unsigned int vdi::allocateInode(int group) {
-    // not yet implemented
-    return 0;
+    // error checking
+    if (group > (int) (superblock.blockGroupCount - 1)) {
+        throw std::range_error("cannot allocate inode, desired group is larger than available groups");
+    }
+
+    if (group < -1) {
+        throw std::invalid_argument("cannot allocate inode, desired group cannot be less than -1");
+    }
+
+    // inode number (assigned in the following if/else)
+    unsigned int iNum = -1;
+
+    if (group == -1) {
+        /* pick any group */
+
+        // for-loop that runs for the amount of block groups
+        for (int i = 0; i < superblock.blockGroupCount; ++i) {
+            try {
+                // attempt allocating an inode at the current value of 'i' and save the resulting inode number
+                iNum = allocateInode(i);
+            } catch (std::runtime_error &) {
+                // no free inodes at block group 'i', loop again
+                continue;
+            }
+
+            if (iNum == -1) {
+                // the entire disks inodes are in use, throw exception
+                throw std::range_error("cannot allocate inode, all inodes in the disk are in use");
+            }
+
+            // inode allocated, break out of for-loop
+            break;
+        }
+    } else {
+        /* pick chosen group */
+
+        // calculate the first inode at the given group
+        iNum = (group * superblock.inodesPerGroup) + 1;
+
+        // loop through inodes within that group until a free one is found
+        bool found = false;
+        for (int i = 0; i < superblock.inodesPerGroup; ++i) {
+            if (!inodeInUse(iNum)) {
+                found = true;
+                break;
+            } else {
+                iNum++;
+            }
+        }
+
+        // throw exception if a free inode cannot be found
+        if (!found) {
+            throw std::runtime_error("cannot allocate inode at specified block, no free inodes");
+        }
+
+        /* ready to allocate inode at this point */
+    }
+
+    // return the inode number that was allocated
+    return iNum;
 }
 
 // mark the given inode as free
