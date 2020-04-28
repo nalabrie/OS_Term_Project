@@ -1209,8 +1209,11 @@ void vdi::fetchBlockFromFile(char *buffer, vdi::inode &in, unsigned int bNum) {
         // move file cursor to the start of the SIB
         seek(locateBlock(in.block[12] - superblock.firstDataBlock));
 
+        // offset the file block number
+        bNum -= 12;
+
         // move file cursor forward in the SIB array to the start of the desired file block number
-        seek((bNum - 12) * 4, std::ios::cur);
+        seek(bNum * 4, std::ios::cur);
 
         // temporary buffer for holding the array value
         char temp[4];
@@ -1225,6 +1228,38 @@ void vdi::fetchBlockFromFile(char *buffer, vdi::inode &in, unsigned int bNum) {
         if (in.block[13] == 0) {
             throw std::range_error("cannot fetch file block, desired block number doesn't exist");
         }
+
+        // move file cursor to the start of the DIB
+        seek(locateBlock(in.block[13] - superblock.firstDataBlock));
+
+        // offset the file block number (for calculating SIB index)
+        bNum = bNum - 12 - k;
+
+        // get the index of the correct SIB
+        unsigned int SIB_index = bNum / k;
+
+        // move file cursor to that SIB
+        seek(SIB_index * 4, std::ios::cur);
+
+        // temporary buffer for holding the array value
+        char temp[4];
+
+        // read the SIB block number, convert to int, and save it as the disk block number
+        read(temp, 4);
+        diskBlock = littleEndianToInt(temp, 4);
+
+        // move the file cursor to the SIB block
+        seek(locateBlock(diskBlock - superblock.firstDataBlock));
+
+        // offset the file block number again (for calculating index within the SIB)
+        bNum = bNum % k;
+
+        // move file cursor forward in the SIB array to the start of the desired file block number
+        seek(bNum * 4, std::ios::cur);
+
+        // read the value, convert to int, and save it as the disk block number
+        read(temp, 4);
+        diskBlock = littleEndianToInt(temp, 4);
     } else {
         /* data block is stored in the triple indirect block */
 

@@ -148,9 +148,13 @@ int main(int argc, char **argv) {
     // file access tests
 
     file.fetchInode(i, 12);  // arduino tarball
-    file.fetchBlockFromFile(buffer, i, 0);
+//    file.fetchBlockFromFile(buffer, i, 60000);
+//
+//    vdi::printBuffer(buffer, file.superblock.blockSize);
 
-    vdi::printBuffer(buffer, file.superblock.blockSize);
+    for (int j = 0; j < 63000; ++j) {
+        file.fetchBlockFromFile(buffer, i, j);
+    }
 
 //    // header tests
 //
