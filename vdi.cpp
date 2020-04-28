@@ -1200,21 +1200,44 @@ void vdi::fetchBlockFromFile(char *buffer, vdi::inode &in, unsigned int bNum) {
         diskBlock = in.block[bNum];
     } else if (bNum < 12 + k) {
         /* data block is stored in the single indirect block */
+
+        // error checking
+        if (in.block[12] == 0) {
+            throw std::range_error("cannot fetch file block, desired block number doesn't exist");
+        }
+
+        // move file cursor to the start of the SIB
+        seek(locateBlock(in.block[12] - superblock.firstDataBlock));
+
+        // move file cursor forward in the SIB array to the start of the desired file block number
+        seek((bNum - 12) * 4, std::ios::cur);
+
+        // temporary buffer for holding the array value
+        char temp[4];
+
+        // read the value, convert to int, and save it as the disk block number
+        read(temp, 4);
+        diskBlock = littleEndianToInt(temp, 4);
     } else if (bNum < 12 + k + k * k) {
         /* data block is stored in the double indirect block */
+
+        // error checking
+        if (in.block[13] == 0) {
+            throw std::range_error("cannot fetch file block, desired block number doesn't exist");
+        }
     } else {
         /* data block is stored in the triple indirect block */
+
+        // error checking
+        if (in.block[14] == 0) {
+            throw std::range_error("cannot fetch file block, desired block number doesn't exist");
+        }
     }
 
     /* disk block number has been calculated at this point, ready for reading */
 
+    // fetch the block into the buffer
     fetchBlock(buffer, diskBlock - superblock.firstDataBlock);
-
-    // move file cursor to the start of the desired block
-    seek(locateBlock(diskBlock - superblock.firstDataBlock));
-
-    // read the block
-    read(buffer, superblock.blockSize);
 }
 
 // write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
