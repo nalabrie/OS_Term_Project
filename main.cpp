@@ -145,8 +145,6 @@ int main(int argc, char **argv) {
 //        cout << file.inodeInUse(j) << endl;
 //    }
 
-    cout << file.allocateInode(0) << endl;
-
 //    // header tests
 //
 //    cout << hex;

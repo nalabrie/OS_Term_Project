@@ -1108,6 +1108,46 @@ unsigned int vdi::allocateInode(int group) {
         }
 
         /* ready to allocate inode at this point */
+
+        // calculate local inode index within the given block group
+        unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+
+        // move file cursor to the start of the inode bitmap block for the given group
+        if (superblock.firstDataBlock == 1) {
+            seek(locateBlock(blockGroupDescriptorTable[group].inodeBitmap - 1));
+        } else {
+            seek(locateBlock(blockGroupDescriptorTable[group].inodeBitmap));
+        }
+
+        // calculate which byte the desired bit is contained in
+        unsigned int byteOffset = localIndex / 8;
+
+        // move cursor that many bytes forward
+        seek(byteOffset, std::ios::cur);
+
+        // temporary buffer for holding the byte
+        char byte;
+
+        // read byte
+        read(&byte, 1);
+
+        // convert byte to 8 digit binary
+        std::bitset<8> binary(byte);
+
+        // calculate the correct bit index of the byte
+        unsigned int bitOffset = localIndex % 8;
+
+        // set the bit to 1
+        binary[bitOffset] = true;
+
+        // convert the binary number to a little endian hex character
+        intToLittleEndianHex(&byte, 1, binary.to_ulong());
+
+        // move cursor back to the correct byte
+        seek(-1, std::ios::cur);
+
+        // write the modified byte back to the file
+        write(&byte, 1);
     }
 
     // return the inode number that was allocated
