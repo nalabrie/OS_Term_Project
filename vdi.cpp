@@ -1267,6 +1267,51 @@ void vdi::fetchBlockFromFile(char *buffer, vdi::inode &in, unsigned int bNum) {
         if (in.block[14] == 0) {
             throw std::range_error("cannot fetch file block, desired block number doesn't exist");
         }
+
+        // move file cursor to the start of the TIB
+        seek(locateBlock(in.block[14] - superblock.firstDataBlock));
+
+        // offset the file block number (for calculating TIB index)
+        bNum = bNum - 12 - k - k * k;
+
+        // get the index of the correct TIB
+        unsigned int TIB_index = bNum / (k * k);
+
+        // move file cursor to that TIB
+        seek(TIB_index * 4, std::ios::cur);
+
+        // temporary buffer for holding the array value
+        char temp[4];
+
+        // read the DIB block number, convert to int, and save it as the disk block number
+        read(temp, 4);
+        diskBlock = littleEndianToInt(temp, 4);
+
+        // move the file cursor to the DIB block
+        seek(locateBlock(diskBlock - superblock.firstDataBlock));
+
+        // get the index of the correct SIB
+        unsigned int SIB_index = bNum / k;
+
+        // move file cursor to that SIB
+        seek(SIB_index * 4, std::ios::cur);
+
+        // read the SIB block number, convert to int, and save it as the disk block number
+        read(temp, 4);
+        diskBlock = littleEndianToInt(temp, 4);
+
+        // move the file cursor to the SIB block
+        seek(locateBlock(diskBlock - superblock.firstDataBlock));
+
+        // offset the file block number again (for calculating index within the SIB)
+        bNum = bNum % k;
+
+        // move file cursor forward in the SIB array to the start of the desired file block number
+        seek(bNum * 4, std::ios::cur);
+
+        // read the value, convert to int, and save it as the disk block number
+        read(temp, 4);
+        diskBlock = littleEndianToInt(temp, 4);
     }
 
     /* disk block number has been calculated at this point, ready for reading */
