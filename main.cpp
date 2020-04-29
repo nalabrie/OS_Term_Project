@@ -1,7 +1,5 @@
 #include <iostream>
-#include <fstream>
 #include <iomanip>
-#include <bitset>
 #include "vdi.h"
 
 using namespace std;

@@ -1323,4 +1323,27 @@ void vdi::fetchBlockFromFile(char *buffer, vdi::inode &in, unsigned int bNum) {
 // write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
 // (buffer must be at least size 'superblock.blockSize')
 void vdi::writeBlockToFile(const char *buffer, vdi::inode &in, unsigned int bNum) {
+    // not implemented, come back to this at the end if there is enough time
+}
+
+// open the directory with the given inode number and return a pointer to the directory struct
+vdi::directory *vdi::openDir(unsigned int iNum) {
+    // not yet implemented
+    return nullptr;
+}
+
+// fetch the next directory entry inside the given directory
+// fill the inode number and name of the entry into 'iNum' nad 'name'
+// returns true on success, false if it hit the end of the directory
+bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
+    // not yet implemented
+    return false;
+}
+
+// reset the directory cursor to 0
+void vdi::rewindDir(vdi::directory *d) {
+}
+
+// close the directory and deallocate the directory pointer
+void vdi::closeDir(vdi::directory *d) {
 }

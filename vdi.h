@@ -78,6 +78,19 @@ public:
                 generation, aclBlock;
     };
 
+    // structure of a directory entry
+    struct dirEntry {
+        unsigned int iNum, recLen, nameLen, fileType, name[1];
+    };
+
+    // structure of a directory
+    struct directory {
+        std::ios::pos_type cursor;
+        inode in;
+        dirEntry entry;
+        unsigned int iNum;
+    };
+
     // path of the opened VDI file
     const char *filePath;
 
@@ -175,6 +188,20 @@ public:
     // write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
     // (buffer must be at least size 'superblock.blockSize')
     void writeBlockToFile(const char *buffer, struct inode &in, unsigned int bNum);
+
+    // open the directory with the given inode number and return a pointer to the directory struct
+    struct directory *openDir(unsigned int iNum);
+
+    // fetch the next directory entry inside the given directory
+    // fill the inode number and name of the entry into 'iNum' nad 'name'
+    // returns true on success, false if it hit the end of the directory
+    bool getNextDirEntry(struct directory *d, unsigned int &iNum, char *name);
+
+    // reset the directory cursor to 0
+    void rewindDir(struct directory *d);
+
+    // close the directory and deallocate the directory pointer
+    void closeDir(struct directory *d);
 };
 
 
