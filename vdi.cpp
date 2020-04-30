@@ -1423,20 +1423,18 @@ unsigned int vdi::searchDir(unsigned int iNum, char *target) {
     directory *d;
     d = openDir(iNum);
 
-    // create dummy variables for 'getNextDirEntry' since they won't get used
-    unsigned int dummyInt;
-    char dummyString[256];
+    // variable for holding the name of the file found in each directory entry
+    char currentEntryName[256];
 
     // loop through the directory entries to find the file
-    while (getNextDirEntry(d, dummyInt, dummyString)) {
+    while (getNextDirEntry(d, iNum, currentEntryName)) {
         // compare the current entry with the target string
-        if (strcmp(target, d->entry.name) == 0) {
+        if (strcmp(target, currentEntryName) == 0) {
             // file found
 
-            // save the inode number, close the directory, return the inode number
-            unsigned int target_iNum = d->entry.iNum;
+            // close the directory, return the inode number
             closeDir(d);
-            return target_iNum;
+            return iNum;
         }
     }
 
