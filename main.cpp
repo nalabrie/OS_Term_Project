@@ -29,6 +29,9 @@ int main(int argc, char **argv) {
     // calculate how many blocks the file takes up
     unsigned int blockCount = in.size / file.superblock.blockSize + 1;
 
+    // calculate the remaining number of bytes in the final block
+    unsigned int remainder = in.size % file.superblock.blockSize;
+
     // buffer for holding each block of data
     char buffer[file.superblock.blockSize];
 
@@ -37,8 +40,14 @@ int main(int argc, char **argv) {
         // read current block into buffer
         file.fetchBlockFromFile(buffer, in, i);
 
-        // write buffer to file
-        out.write(buffer, file.superblock.blockSize);
+        // if the loop is on the final block
+        if (i == blockCount - 1 && remainder != 0) {
+            // write only the remaining bytes, not the entire block
+            out.write(buffer, remainder);
+        } else {
+            // not on the final block (or the file takes up exactly the final block), write the entire block
+            out.write(buffer, file.superblock.blockSize);
+        }
     }
 
 
