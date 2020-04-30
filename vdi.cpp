@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <cmath>
 #include <bitset>
+#include <cstring>
 #include "vdi.h"
 
 // only constructor, takes path to VDI file
@@ -1418,7 +1419,28 @@ void vdi::closeDir(vdi::directory *d) {
 // searches a directory with inode 'iNum' for the target file 'target' and returns the inode number of the file
 // note: returns 0 if a file is not found
 unsigned int vdi::searchDir(unsigned int iNum, char *target) {
-    // not yet implemented
+    // open the directory at inode number 'iNum'
+    directory *d;
+    d = openDir(iNum);
+
+    // create dummy variables for 'getNextDirEntry' since they won't get used
+    unsigned int dummyInt;
+    char dummyString[256];
+
+    // loop through the directory entries to find the file
+    while (getNextDirEntry(d, dummyInt, dummyString)) {
+        // compare the current entry with the target string
+        if (strcmp(target, d->entry.name) == 0) {
+            // file found
+
+            // save the inode number, close the directory, return the inode number
+            unsigned int target_iNum = d->entry.iNum;
+            closeDir(d);
+            return target_iNum;
+        }
+    }
+
+    // file not found
     return 0;
 }
 

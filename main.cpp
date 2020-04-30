@@ -170,6 +170,9 @@ int main(int argc, char **argv) {
 
     // directory search tests
 
+    char target[] = "arduino-1.6.7-linux64.tar.xz";
+    cout << "inode number: " << file.searchDir(2, target) << endl;
+
     // file path splitting tests
 
 //    // header tests
