@@ -1,17 +1,62 @@
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include "vdi.h"
 
 using namespace std;
 
 int main(int argc, char **argv) {
+    if (argc != 4) {
+        throw invalid_argument(
+                "program needs 3 arguments in this order: "
+                "VDI file, desired file within the VDI, output file to write to");
+    }
+
     // open VDI file passed to the program as an argument
     vdi file = vdi(argv[1]);
 
+    // open the file to write out to
+    ofstream out;
+    out.open(argv[3], ios::out | ios::trunc | ios::binary);
+
+    // get inode number of desired file
+    unsigned int iNum = file.traversePath(argv[2]);
+
+    // get inode
+    vdi::inode in{};
+    file.fetchInode(in, iNum);
+
+    // calculate how many blocks the file takes up
+    unsigned int blockCount = in.size / file.superblock.blockSize + 1;
+
+    // buffer for holding each block of data
+    char buffer[file.superblock.blockSize];
+
+    // loop through the file block by block
+    for (int i = 0; i < blockCount; ++i) {
+        // read current block into buffer
+        file.fetchBlockFromFile(buffer, in, i);
+
+        // write buffer to file
+        out.write(buffer, file.superblock.blockSize);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     /* TESTING BELOW THIS LINE */
 
-    static const unsigned int size = file.superblock.blockSize;
-    char buffer[size];
+//    static const unsigned int size = file.superblock.blockSize;
+//    char buffer[size];
 
 //    file.seek(file.header.offsetData + 0x1be);  // partition table
 //    file.read(buffer, size);
@@ -24,7 +69,7 @@ int main(int argc, char **argv) {
 //    cout << a << endl;
 //    vdi::printBuffer(buffer, size);
 
-    struct vdi::superblock s{};
+//    struct vdi::superblock s{};
 
 //    file.partitionOpen(1);
 //    file.fetchBlock(buffer, 0);
@@ -68,8 +113,8 @@ int main(int argc, char **argv) {
 
     // BGDT tests
 
-    struct vdi::blockGroupDescriptorTable b{};
-    struct vdi::blockGroupDescriptorTable BGDT_array[file.superblock.blockGroupCount];
+//    struct vdi::blockGroupDescriptorTable b{};
+//    struct vdi::blockGroupDescriptorTable BGDT_array[file.superblock.blockGroupCount];
 
 //    cout << "block 0" << endl;
 //    file.fetchBlock(buffer, 0);
@@ -104,7 +149,7 @@ int main(int argc, char **argv) {
 
     // inode tests
 
-    struct vdi::inode i{};
+//    struct vdi::inode i{};
 
 //    for (int j = 1; j < 2049; ++j) {
 //        file.fetchInode(i, j);
@@ -156,27 +201,27 @@ int main(int argc, char **argv) {
 
     // directory access tests
 
-    char name[256];
-    unsigned int iNum;
-    vdi::directory *d;
-
-    d = file.openDir(2);
-
-    while (file.getNextDirEntry(d, iNum, name)) {
-        cout << "Inode:\t" << iNum << "\tname: [" << name << "]" << endl;
-    }
-
-    file.closeDir(d);
+//    char name[256];
+//    unsigned int iNum;
+//    vdi::directory *d;
+//
+//    d = file.openDir(2);
+//
+//    while (file.getNextDirEntry(d, iNum, name)) {
+//        cout << "Inode:\t" << iNum << "\tname: [" << name << "]" << endl;
+//    }
+//
+//    file.closeDir(d);
 
     // directory search tests
 
-    char target[] = "arduino-1.6.7-linux64.tar.xz";
-    cout << "inode number: " << file.searchDir(2, target) << endl;
+//    char target[] = "arduino-1.6.7-linux64.tar.xz";
+//    cout << "inode number: " << file.searchDir(2, target) << endl;
 
     // file path splitting tests
 
-    char fullPath[] = "/examples/05.Control/switchCase2/switchCase2.txt";
-    cout << file.traversePath(fullPath) << endl;  // should be 14248
+//    char fullPath[] = "/examples/05.Control/switchCase2/switchCase2.txt";
+//    cout << file.traversePath(fullPath) << endl;  // should be 14248
 
 //    // header tests
 //
