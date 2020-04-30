@@ -80,15 +80,16 @@ public:
 
     // structure of a directory entry
     struct dirEntry {
-        unsigned int iNum, recLen, nameLen, fileType, name[1];
+        unsigned int iNum, recLen, nameLen, fileType;
+        char name[256];
     };
 
     // structure of a directory
     struct directory {
-        std::ios::pos_type cursor;
         inode in;
         dirEntry entry;
-        unsigned int iNum;
+        unsigned int iNum, cursor = 0;
+        char *block;
     };
 
     // path of the opened VDI file
@@ -193,7 +194,7 @@ public:
     struct directory *openDir(unsigned int iNum);
 
     // fetch the next directory entry inside the given directory
-    // fill the inode number and name of the entry into 'iNum' nad 'name'
+    // fill the inode number and name of the entry into 'iNum' and 'name'
     // returns true on success, false if it hit the end of the directory
     bool getNextDirEntry(struct directory *d, unsigned int &iNum, char *name);
 

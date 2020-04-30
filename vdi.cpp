@@ -1328,15 +1328,73 @@ void vdi::writeBlockToFile(const char *buffer, vdi::inode &in, unsigned int bNum
 
 // open the directory with the given inode number and return a pointer to the directory struct
 vdi::directory *vdi::openDir(unsigned int iNum) {
-    // not yet implemented
-    return nullptr;
+    // create new directory pointer
+    auto *d = new directory;
+
+    // fill out directory struct fields
+    fetchInode(d->in, iNum);
+    d->iNum = iNum;
+    d->block = new char[superblock.blockSize];
+
+    // return directory pointer
+    return d;
 }
 
 // fetch the next directory entry inside the given directory
-// fill the inode number and name of the entry into 'iNum' nad 'name'
+// fill the inode number and name of the entry into 'iNum' and 'name'
 // returns true on success, false if it hit the end of the directory
 bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
-    // not yet implemented
+    // only run if there is another entry in the given directory
+    if (d->cursor < d->in.size) {
+        // calculate block number
+        unsigned int blockNum = d->cursor / superblock.blockSize;
+
+        // get offset with the block
+        unsigned int offset = d->cursor - (blockNum * superblock.blockSize);
+
+        // fetch the block
+        fetchBlockFromFile(d->block, d->in, blockNum);
+
+        // get the entry information from the retrieved block (the following 5 for-loops)
+        char buffer[4];
+        for (int i = 0; i < 4; ++i) {
+            buffer[i] = d->block[offset++];
+        }
+        d->entry.iNum = littleEndianToInt(buffer, 4);  // assign iNum
+        for (int i = 0; i < 2; ++i) {
+            buffer[i] = d->block[offset++];
+        }
+        d->entry.recLen = littleEndianToInt(buffer, 2);  // assign recLen
+        for (int i = 0; i < 1; ++i) {
+            buffer[i] = d->block[offset++];
+        }
+        d->entry.nameLen = littleEndianToInt(buffer, 1);  // assign nameLen
+        for (int i = 0; i < 1; ++i) {
+            buffer[i] = d->block[offset++];
+        }
+        d->entry.fileType = littleEndianToInt(buffer, 1);  // assign fileType
+        for (int i = 0; i < d->entry.nameLen; ++i) {
+            d->entry.name[i] = d->block[offset++];  // assign name
+        }
+
+        // place the ending character at the end of the entry name
+        d->entry.name[d->entry.nameLen] = '\0';
+
+        // increment cursor to the start of the next entry
+        d->cursor += d->entry.recLen;
+
+        // fill out supplied 'iNum' and 'name'
+        iNum = d->entry.iNum;
+        for (int i = 0; i < d->entry.nameLen; ++i) {
+            name[i] = d->entry.name[i];
+        }
+        name[d->entry.nameLen] = '\0';
+
+        // entry found
+        return true;
+    }
+
+    // hit the end of the directory
     return false;
 }
 

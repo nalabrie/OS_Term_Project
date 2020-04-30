@@ -145,14 +145,30 @@ int main(int argc, char **argv) {
 
     // file access tests
 
-    file.fetchInode(i, 12);  // arduino tarball
-
-    file.fetchBlockFromFile(buffer, i, 70000);
-    vdi::printBuffer(buffer, file.superblock.blockSize);
+//    file.fetchInode(i, 12);  // arduino tarball
+//
+//    file.fetchBlockFromFile(buffer, i, 70000);
+//    vdi::printBuffer(buffer, file.superblock.blockSize);
 
 //    for (int j = 66000; j < 80000; ++j) {
 //        file.fetchBlockFromFile(buffer, i, j);
 //    }
+
+    // directory access tests
+
+    char name[256];
+    unsigned int iNum;
+    vdi::directory *d;
+
+    d = file.openDir(30481);  // opens root directory
+
+    while (file.getNextDirEntry(d, iNum, name)) {
+        cout << "Inode:\t" << iNum << "\tname: [" << name << "]" << endl;
+    }
+
+
+
+
 
 //    // header tests
 //
