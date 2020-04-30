@@ -160,15 +160,13 @@ int main(int argc, char **argv) {
     unsigned int iNum;
     vdi::directory *d;
 
-    d = file.openDir(30481);  // opens root directory
+    d = file.openDir(30481);
 
     while (file.getNextDirEntry(d, iNum, name)) {
         cout << "Inode:\t" << iNum << "\tname: [" << name << "]" << endl;
     }
 
-
-
-
+    file.closeDir(d);
 
 //    // header tests
 //

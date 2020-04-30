@@ -1361,6 +1361,12 @@ bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
             buffer[i] = d->block[offset++];
         }
         d->entry.iNum = littleEndianToInt(buffer, 4);  // assign iNum
+
+        if (d->entry.iNum == 0) {
+            // hit the end of the directory
+            return false;
+        }
+
         for (int i = 0; i < 2; ++i) {
             buffer[i] = d->block[offset++];
         }
@@ -1400,8 +1406,11 @@ bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
 
 // reset the directory cursor to 0
 void vdi::rewindDir(vdi::directory *d) {
+    d->cursor = 0;
 }
 
 // close the directory and deallocate the directory pointer
 void vdi::closeDir(vdi::directory *d) {
+    delete[] d->block;
+    delete d;
 }
