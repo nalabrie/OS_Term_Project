@@ -1444,6 +1444,40 @@ unsigned int vdi::searchDir(unsigned int iNum, char *target) {
 
 // takes a full file path and returns the inode number of the file
 unsigned int vdi::traversePath(char *path) {
-    // not yet implemented
-    return 0;
+    // used in the following while-loop as an index for 'path' array
+    unsigned int start = 1;
+
+    // length of the path string
+    unsigned int len = strlen(path);
+
+    // inode number to be returned
+    unsigned int iNum = 2;
+
+    // loop until the path has been fully processed to the end or the file was not found (iNum == 0)
+    while (start < len && iNum != 0) {
+        // loop through path to find the location of the next '/'
+        int end = 0;
+        for (int i = 1; i < len; ++i) {
+            if (path[i] == '/') {
+                // store index of found '/' and stop looping
+                end = i;
+                break;
+            }
+        }
+
+        // replace '/' with '0'
+        path[end] = 0;
+
+        // find iNum of next entry in the path
+        iNum = searchDir(iNum, path + start);
+        if (end != 0) {
+            // increment starting position and loop again
+            start = end + 1;
+        } else {
+            // file found, exit loop
+            break;
+        }
+    }
+
+    return iNum;
 }

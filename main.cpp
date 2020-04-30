@@ -175,6 +175,9 @@ int main(int argc, char **argv) {
 
     // file path splitting tests
 
+    char fullPath[] = "/examples/05.Control/switchCase2/switchCase2.txt";
+    cout << file.traversePath(fullPath) << endl;  // should be 14248
+
 //    // header tests
 //
 //    cout << hex;
