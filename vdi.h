@@ -203,6 +203,13 @@ public:
 
     // close the directory and deallocate the directory pointer
     void closeDir(struct directory *d);
+
+    // searches a directory with inode 'iNum' for the target file 'target' and returns the inode number of the file
+    // note: returns 0 if a file is not found
+    unsigned int searchDir(unsigned int iNum, char *target);
+
+    // takes a full file path and returns the inode number of the file
+    unsigned int traversePath(char *path);
 };
 
 

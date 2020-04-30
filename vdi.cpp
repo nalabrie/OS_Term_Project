@@ -1414,3 +1414,16 @@ void vdi::closeDir(vdi::directory *d) {
     delete[] d->block;
     delete d;
 }
+
+// searches a directory with inode 'iNum' for the target file 'target' and returns the inode number of the file
+// note: returns 0 if a file is not found
+unsigned int vdi::searchDir(unsigned int iNum, char *target) {
+    // not yet implemented
+    return 0;
+}
+
+// takes a full file path and returns the inode number of the file
+unsigned int vdi::traversePath(char *path) {
+    // not yet implemented
+    return 0;
+}
