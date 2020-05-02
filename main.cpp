@@ -1,6 +1,5 @@
 #include <iostream>
 #include <iomanip>
-#include <fstream>
 #include "vdi.h"
 
 using namespace std;
@@ -18,6 +17,9 @@ int main(int argc, char **argv) {
     // open the file to write out to
     ofstream out;
     out.open(argv[3], ios::out | ios::trunc | ios::binary);
+
+    // show status message to user
+    cout << "copying file \"" << argv[2] << "\" from VDI to host system as \"" << argv[3] << "\"" << endl;
 
     // get inode number of desired file
     unsigned int iNum = file.traversePath(argv[2]);
@@ -49,6 +51,13 @@ int main(int argc, char **argv) {
             out.write(buffer, file.superblock.blockSize);
         }
     }
+
+    // show status messages to user
+    cout << "file finished copying" << endl;
+    cout << "now printing all files and folders inside the VDI file:" << endl << endl;
+
+    // print all files
+    file.printAllFiles(2);
 
 
 

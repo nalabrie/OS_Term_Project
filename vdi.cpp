@@ -1420,8 +1420,7 @@ void vdi::closeDir(vdi::directory *d) {
 // note: returns 0 if a file is not found
 unsigned int vdi::searchDir(unsigned int iNum, char *target) {
     // open the directory at inode number 'iNum'
-    directory *d;
-    d = openDir(iNum);
+    directory *d = openDir(iNum);
 
     // variable for holding the name of the file found in each directory entry
     char currentEntryName[256];
@@ -1480,4 +1479,32 @@ unsigned int vdi::traversePath(char *path) {
     }
 
     return iNum;
+}
+
+// prints all files and directories inside the VDI file starting at inode 'iNum' and goes to the end of the disk
+// note: iNum of 2 lists all files/folders inside the VDI file
+void vdi::printAllFiles(unsigned int iNum) {
+    // open the directory at inode 'iNum'
+    directory *d = openDir(iNum);
+
+    // variable for holding file name of each entry
+    char name[256];
+
+    // loop through the current directory
+    while (getNextDirEntry(d, iNum, name)) {
+        // skip the . and .. entries
+        if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) continue;
+
+        // print file/folder information
+        std::cout << "inode:\t[" << iNum << "]\tname:\t[" << name << "]" << std::endl;
+
+        // if current entry is a folder
+        if (d->entry.fileType == 2) {
+            // recursive call to this function with the current folder
+            printAllFiles(iNum);
+        }
+    }
+
+    // close the directory
+    closeDir(d);
 }
