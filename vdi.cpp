@@ -1483,8 +1483,12 @@ unsigned int vdi::traversePath(char *path) {
 
 // print the info of a file at the current 'directory entry' stored in directory 'd'
 void vdi::printFileInfo(vdi::directory *d) {
+    // get directory entry inode
+    inode i{};
+    fetchInode(i, d->entry.iNum);
+
     // get mtime as a time object
-    time_t mtime = d->in.mtime;
+    time_t mtime = i.mtime;
 
     // convert file permissions to readable format, store as string
     std::string permissions;
@@ -1500,7 +1504,7 @@ void vdi::printFileInfo(vdi::directory *d) {
 
     // get rest of permissions as octal number string to be added to 'permissions' later
     std::stringstream octalPermissions;
-    octalPermissions << std::oct << d->in.mode << std::dec;
+    octalPermissions << std::oct << i.mode << std::dec;
     std::string octalPermissionsString = octalPermissions.str();
 
     // convert each permission value to integers
@@ -1599,17 +1603,12 @@ void vdi::printFileInfo(vdi::directory *d) {
             throw std::invalid_argument("cannot interpret file permission for 'other', value not between 0-7 (octal)");
     }
 
-    // get file size
-    inode i{};
-    fetchInode(i, d->entry.iNum);
-    unsigned int fsize = i.size;
-
     // trim the newline off the end of the mtime
     std::string mtime_string = ctime(&mtime);
     mtime_string[mtime_string.length() - 1] = '\0';
 
     // print file/folder info
-    std::cout << permissions << ' ' << i.linksCount << '\t' << i.uid << '\t' << i.gid << '\t' << fsize
+    std::cout << permissions << ' ' << i.linksCount << '\t' << i.uid << '\t' << i.gid << '\t' << i.size
               << "      \t" << mtime_string << '\t' << d->entry.name << std::endl;
 }
 
