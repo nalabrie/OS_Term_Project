@@ -1609,7 +1609,7 @@ void vdi::printFileInfo(vdi::directory *d) {
     mtime_string[mtime_string.length() - 1] = '\0';
 
     // print file/folder info
-    std::cout << permissions << ' ' << d->in.linksCount << '\t' << d->in.uid << ' ' << d->in.gid << '\t' << fsize
+    std::cout << permissions << ' ' << i.linksCount << '\t' << i.uid << '\t' << i.gid << '\t' << fsize
               << "      \t" << mtime_string << '\t' << d->entry.name << std::endl;
 }
 
