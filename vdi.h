@@ -211,6 +211,9 @@ public:
     // takes a full file path and returns the inode number of the file
     unsigned int traversePath(char *path);
 
+    // print the info of a file at the current 'directory entry' stored in directory 'd'
+    void printFileInfo(struct directory *d);
+
     // prints all files and directories inside the VDI file starting at inode 'iNum' and goes to the end of the disk
     // note: iNum of 2 lists all files/folders inside the VDI file
     void printAllFiles(unsigned int iNum);

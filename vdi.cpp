@@ -1481,6 +1481,138 @@ unsigned int vdi::traversePath(char *path) {
     return iNum;
 }
 
+// print the info of a file at the current 'directory entry' stored in directory 'd'
+void vdi::printFileInfo(vdi::directory *d) {
+    // get mtime as a time object
+    time_t mtime = d->in.mtime;
+
+    // convert file permissions to readable format, store as string
+    std::string permissions;
+
+    // if the entry is a folder
+    if (d->entry.fileType == 2) {
+        // mark as 'd'
+        permissions += "d";
+    } else {
+        // mark as '-' (file)
+        permissions += "-";
+    }
+
+    // get rest of permissions as octal number string to be added to 'permissions' later
+    std::stringstream octalPermissions;
+    octalPermissions << std::oct << d->in.mode << std::dec;
+    std::string octalPermissionsString = octalPermissions.str();
+
+    // convert each permission value to integers
+    unsigned int user, group, other;
+    other = octalPermissionsString[octalPermissionsString.length() - 1] - '0';
+    group = octalPermissionsString[octalPermissionsString.length() - 2] - '0';
+    user = octalPermissionsString[octalPermissionsString.length() - 3] - '0';
+
+    // set user permissions
+    switch (user) {
+        case 0:
+            permissions += "---";
+            break;
+        case 1:
+            permissions += "--x";
+            break;
+        case 2:
+            permissions += "-w-";
+            break;
+        case 3:
+            permissions += "-wx";
+            break;
+        case 4:
+            permissions += "r--";
+            break;
+        case 5:
+            permissions += "r-x";
+            break;
+        case 6:
+            permissions += "rw-";
+            break;
+        case 7:
+            permissions += "rwx";
+            break;
+        default:
+            throw std::invalid_argument("cannot interpret file permission for 'user', value not between 0-7 (octal)");
+    }
+
+    // set group permissions
+    switch (group) {
+        case 0:
+            permissions += "---";
+            break;
+        case 1:
+            permissions += "--x";
+            break;
+        case 2:
+            permissions += "-w-";
+            break;
+        case 3:
+            permissions += "-wx";
+            break;
+        case 4:
+            permissions += "r--";
+            break;
+        case 5:
+            permissions += "r-x";
+            break;
+        case 6:
+            permissions += "rw-";
+            break;
+        case 7:
+            permissions += "rwx";
+            break;
+        default:
+            throw std::invalid_argument("cannot interpret file permission for 'group', value not between 0-7 (octal)");
+    }
+
+    // set other permissions
+    switch (other) {
+        case 0:
+            permissions += "---";
+            break;
+        case 1:
+            permissions += "--x";
+            break;
+        case 2:
+            permissions += "-w-";
+            break;
+        case 3:
+            permissions += "-wx";
+            break;
+        case 4:
+            permissions += "r--";
+            break;
+        case 5:
+            permissions += "r-x";
+            break;
+        case 6:
+            permissions += "rw-";
+            break;
+        case 7:
+            permissions += "rwx";
+            break;
+        default:
+            throw std::invalid_argument("cannot interpret file permission for 'other', value not between 0-7 (octal)");
+    }
+
+    // get file size
+    inode i{};
+    fetchInode(i, d->entry.iNum);
+    unsigned int fsize = i.size;
+
+    // trim the newline off the end of the mtime
+    std::string mtime_string = ctime(&mtime);
+    mtime_string[mtime_string.length() - 1] = '\0';
+
+    // print file/folder info
+    std::cout << permissions << ' ' << d->in.linksCount << '\t' << d->in.uid << ' ' << d->in.gid << '\t' << fsize
+              << "      \t" << mtime_string << '\t' << d->entry.name << std::endl;
+}
+
 // prints all files and directories inside the VDI file starting at inode 'iNum' and goes to the end of the disk
 // note: iNum of 2 lists all files/folders inside the VDI file
 void vdi::printAllFiles(unsigned int iNum) {
@@ -1496,7 +1628,7 @@ void vdi::printAllFiles(unsigned int iNum) {
         if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) continue;
 
         // print file/folder information
-        std::cout << "inode:\t[" << iNum << "]\tname:\t[" << name << "]" << std::endl;
+        printFileInfo(d);
 
         // if current entry is a folder
         if (d->entry.fileType == 2) {
