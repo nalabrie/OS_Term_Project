@@ -1,4 +1,4 @@
-NAME=OS_Term_Project
+NAME=VDI_file_extractor
 
 CC=g++-10
 STD=-std=c++17
@@ -37,11 +37,11 @@ re: rclean all
 # rebuild "debug"
 dre: dclean debug
 
-# run "release" (copy an xz file from the 1k block sized vdi to host drive)
+# run "release" (copy the arduino xz file from the 1k block sized vdi to host drive)
 run: re
 	./out/release/$(NAME) ./out/Test-fixed-1k.vdi /arduino-1.6.7-linux64.tar.xz ./out/release/arduino-1.6.7-linux64.tar.xz
 
-# run "debug" (copy an xz file from the 1k block sized vdi to host drive)
+# run "debug" (copy the arduino xz file from the 1k block sized vdi to host drive)
 drun: dre
 	./out/debug/$(NAME) ./out/Test-fixed-1k.vdi /arduino-1.6.7-linux64.tar.xz ./out/debug/arduino-1.6.7-linux64.tar.xz
 
