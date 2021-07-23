@@ -7,8 +7,7 @@ int main(int argc, char **argv) {
   if (argc != 4) {
     throw std::invalid_argument(
         "program needs 3 arguments in this order:\n"
-        "path to VDI file, path to a file within the VDI, output file to write to on the host "
-        "system");
+        "path to VDI file, path to a file within the VDI, output file to write to on the host system");
   }
 
   // open VDI file passed to the program as an argument
@@ -19,8 +18,7 @@ int main(int argc, char **argv) {
   out.open(argv[3], std::ios::out | std::ios::trunc | std::ios::binary);
 
   // show status message to user
-  std::cout << "copying file \"" << argv[2] << "\" from VDI to host system as \"" << argv[3]
-            << "\"\n";
+  std::cout << "copying file \"" << argv[2] << "\" from VDI to host system as \"" << argv[3] << "\"\n";
 
   // get inode number of desired file
   unsigned int iNum = file.traversePath(argv[2]);
