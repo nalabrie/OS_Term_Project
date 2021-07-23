@@ -186,7 +186,7 @@ class vdi {
 
   // read the file block 'bNum' into a buffer of the file represented by the supplied inode
   // (buffer must be at least size 'superblock.blockSize')
-  void fetchBlockFromFile(char *buffer, struct inode &in, unsigned int bNum);
+  void fetchBlockFromFile(char *buffer, const struct inode &in, unsigned int bNum);
 
   // write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
   // (buffer must be at least size 'superblock.blockSize')

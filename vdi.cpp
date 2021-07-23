@@ -1184,7 +1184,7 @@ void vdi::freeInode(unsigned int iNum) {
 
 // read the file block 'bNum' into a buffer of the file represented by the supplied inode
 // (buffer must be at least size 'superblock.blockSize')
-void vdi::fetchBlockFromFile(char *buffer, vdi::inode &in, unsigned int bNum) {
+void vdi::fetchBlockFromFile(char *buffer, const vdi::inode &in, unsigned int bNum) {
   // array length of the inode indirect blocks
   unsigned int k = superblock.blockSize / 4;
 
