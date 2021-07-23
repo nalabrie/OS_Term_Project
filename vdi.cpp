@@ -95,14 +95,14 @@ void vdi::printBuffer(const char *buffer, unsigned int size) {
   std::ios_base::fmtflags oldFlags(std::cout.flags());
 
   // loop through entire 'buffer'
-  for (int i = 0; i < size; ++i) {
+  for (unsigned int i = 0; i < size; ++i) {
     // condition is true every 16 loops
     if (i % 16 == 0 && i != 0) {
       // move 4 spaces away from hex block
       std::cout << "   ";
 
       // loop through the previous 16 again
-      for (int j = i - 16; j < i; ++j) {
+      for (unsigned int j = i - 16; j < i; ++j) {
         if ((int)buffer[j] >= 32 && (int)buffer[j] <= 126) {
           // only print readable characters
           std::cout << buffer[j];
@@ -127,7 +127,7 @@ void vdi::printBuffer(const char *buffer, unsigned int size) {
 
   // if the final hex line is not a full line
   if (size % 16 != 0) {
-    for (int i = 0; i < (16 - (size % 16)) * 3; ++i) {
+    for (unsigned int i = 0; i < (16 - (size % 16)) * 3; ++i) {
       // fill the remaining area with spaces
       std::cout << " ";
     }
@@ -751,7 +751,7 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int bl
   seek(blockStart);
 
   // loop through each row of the table
-  for (int i = 0; i < superblock.blockGroupCount; ++i) {
+  for (unsigned int i = 0; i < superblock.blockGroupCount; ++i) {
     // get block bitmap
     read(buffer, 4);
     bgdt[i].blockBitmap = littleEndianToInt(buffer, 4);
@@ -802,7 +802,7 @@ void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned 
   seek(blockStart);
 
   // loop through each row of the table
-  for (int i = 0; i < superblock.blockGroupCount; ++i) {
+  for (unsigned int i = 0; i < superblock.blockGroupCount; ++i) {
     // get block bitmap
     intToLittleEndianHex(buffer, 4, bgdt[i].blockBitmap);
     write(buffer, 4);
@@ -1046,12 +1046,14 @@ unsigned int vdi::allocateInode(int group) {
 
   // inode number (assigned in the following if/else)
   unsigned int iNum = -1;
+  // TODO: Who is the idiot that assigned -1 to an unsigned int? Oh yeah, it was me. Not sure what the correct fix is at
+  // the moment, come back to this later.
 
   if (group == -1) {
     /* pick any group */
 
     // for-loop that runs for the amount of block groups
-    for (int i = 0; i < superblock.blockGroupCount; ++i) {
+    for (unsigned int i = 0; i < superblock.blockGroupCount; ++i) {
       try {
         // attempt allocating an inode at the current value of 'i' and save the resulting inode number
         iNum = allocateInode(i);
@@ -1076,7 +1078,7 @@ unsigned int vdi::allocateInode(int group) {
 
     // loop through inodes within that group until a free one is found
     bool found = false;
-    for (int i = 0; i < superblock.inodesPerGroup; ++i) {
+    for (unsigned int i = 0; i < superblock.inodesPerGroup; ++i) {
       if (!inodeInUse(iNum)) {
         found = true;
         break;
@@ -1375,7 +1377,7 @@ bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
       buffer[i] = d->block[offset++];
     }
     d->entry.fileType = littleEndianToInt(buffer, 1);  // assign fileType
-    for (int i = 0; i < d->entry.nameLen; ++i) {
+    for (unsigned int i = 0; i < d->entry.nameLen; ++i) {
       d->entry.name[i] = d->block[offset++];  // assign name
     }
 
@@ -1387,7 +1389,7 @@ bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
 
     // fill out supplied 'iNum' and 'name'
     iNum = d->entry.iNum;
-    for (int i = 0; i < d->entry.nameLen; ++i) {
+    for (unsigned int i = 0; i < d->entry.nameLen; ++i) {
       name[i] = d->entry.name[i];
     }
     name[d->entry.nameLen] = '\0';
@@ -1448,8 +1450,8 @@ unsigned int vdi::traversePath(char *path) {
   // loop until the path has been fully processed to the end or the file was not found (iNum == 0)
   while (start < len && iNum != 0) {
     // loop through path to find the location of the next '/'
-    int end = 0;
-    for (int i = 1; i < len; ++i) {
+    unsigned int end = 0;
+    for (unsigned int i = 1; i < len; ++i) {
       if (path[i] == '/') {
         // store index of found '/' and stop looping
         end = i;

@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
   char buffer[file.superblock.blockSize];
 
   // loop through the file block by block
-  for (int i = 0; i < blockCount; ++i) {
+  for (unsigned int i = 0; i < blockCount; ++i) {
     // read current block into buffer
     file.fetchBlockFromFile(buffer, in, i);
 
