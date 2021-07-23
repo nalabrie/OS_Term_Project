@@ -108,7 +108,8 @@ class vdi {
   void read(char *buffer, std::streamsize size);
 
   // write 'size' amount bytes from 'buffer' to VDI (starting at cursor)
-  void write(const char *buffer, std::streamsize size);
+  // TODO: unused function, commented out for now
+  // void write(const char *buffer, std::streamsize size);
 
   // sets the position of the file cursor to byte 'position' inside the virtual disk
   void seek(std::ios::pos_type position);
@@ -118,17 +119,20 @@ class vdi {
   void seek(std::ios::off_type offset, std::ios_base::seekdir direction);
 
   // gets the position of the cursor within the VDI file
-  std::ios::pos_type cursor();
+  // TODO: unused function, commented out for now
+  // std::ios::pos_type cursor();
 
   // prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
-  static void printBuffer(const char *buffer, unsigned int size);
+  // TODO: unused function, commented out for now
+  // static void printBuffer(const char *buffer, unsigned int size);
 
   // converts the given character buffer from little endian to a single int ('size' = length of buffer)
   static int littleEndianToInt(const char *buffer, int size);
 
   // converts an int to a hex in little endian format and places the result into a character buffer
   // (buffer size of 4 will hold the full int, less than 4 will truncate)
-  static void intToLittleEndianHex(char *buffer, unsigned int bufferSize, unsigned int num);
+  // TODO: unused function, commented out for now
+  // static void intToLittleEndianHex(char *buffer, unsigned int bufferSize, unsigned int num);
 
   // open a partition by its number (1-4)
   void partitionOpen(int number);
@@ -140,7 +144,8 @@ class vdi {
   void partitionRead(char *buffer, std::streamsize size);
 
   // write 'size' amount bytes from 'buffer' to the opened partition (starting at cursor)
-  void partitionWrite(const char *buffer, std::streamsize size);
+  // TODO: unused function, commented out for now
+  // void partitionWrite(const char *buffer, std::streamsize size);
 
   // sets the position of the file cursor to byte 'position' (0 = start of the opened partition)
   void partitionSeek(std::ios::pos_type position);
@@ -154,35 +159,41 @@ class vdi {
 
   // write the contents of the buffer into the block indicated by 'blockNum'
   // (buffer cannot be bigger than 'superblock.blockSize')
-  void writeBlock(const char *buffer, unsigned int blockNum);
+  // TODO: unused function, commented out for now
+  // void writeBlock(const char *buffer, unsigned int blockNum);
 
   // read the superblock into the supplied structure at the specified block number
   void fetchSuperblock(struct superblock &sb, unsigned int blockNum);
 
   // write the supplied superblock structure into the superblock at the specified block number
-  void writeSuperblock(const struct superblock &sb, unsigned int blockNum);
+  // TODO: unused function, commented out for now
+  // void writeSuperblock(const struct superblock &sb, unsigned int blockNum);
 
   // read the block group descriptor table into the supplied structure at the specified block number
   void fetchBGDT(struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
 
   // write the supplied block group descriptor table structure into the block group descriptor table
   // at the specified block number
-  void writeBGDT(const struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
+  // void writeBGDT(const struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
 
   // read the inode at the specified inode index into an inode structure
   void fetchInode(struct inode &in, unsigned int iNum);
 
   // write the given inode structure at the specified inode index
-  void writeInode(const struct inode &in, unsigned int iNum);
+  // TODO: unused function, commented out for now
+  // void writeInode(const struct inode &in, unsigned int iNum);
 
   // checks if an inode is in use (true = in use)
-  bool inodeInUse(unsigned int iNum);
+  // TODO: unused function, commented out for now
+  // bool inodeInUse(unsigned int iNum);
 
   // allocate any free inode in the given group and return its inode number (group = -1 means pick any group)
-  unsigned int allocateInode(int group);
+  // TODO: unused function, commented out for now
+  // unsigned int allocateInode(int group);
 
   // mark the given inode as free
-  void freeInode(unsigned int iNum);
+  // TODO: unused function, commented out for now
+  // void freeInode(unsigned int iNum);
 
   // read the file block 'bNum' into a buffer of the file represented by the supplied inode
   // (buffer must be at least size 'superblock.blockSize')
@@ -190,7 +201,8 @@ class vdi {
 
   // write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
   // (buffer must be at least size 'superblock.blockSize')
-  void writeBlockToFile(const char *buffer, struct inode &in, unsigned int bNum);
+  // TODO: unused function, commented out for now
+  // void writeBlockToFile(const char *buffer, struct inode &in, unsigned int bNum);
 
   // open the directory with the given inode number and return a pointer to the directory struct
   struct directory *openDir(unsigned int iNum);
@@ -201,7 +213,8 @@ class vdi {
   bool getNextDirEntry(struct directory *d, unsigned int &iNum, char *name);
 
   // reset the directory cursor to 0
-  void rewindDir(struct directory *d);
+  // TODO: unused function, commented out for now
+  // void rewindDir(struct directory *d);
 
   // close the directory and deallocate the directory pointer
   void closeDir(struct directory *d);
