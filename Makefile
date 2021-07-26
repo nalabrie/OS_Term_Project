@@ -48,3 +48,8 @@ drun: dre
 # build "debug"
 debug: $(SRC)
 	$(CC) $(STD) $(DEBUG_FLAGS) $(LIBS) $(SRC) -o ./out/debug/$(NAME)
+
+# use 7-zip to package the source code for distribution
+package: fclean
+	$(RM) source.zip
+	7z a source.zip . -xr!.* -x!out/Test-fixed-4k.vdi
