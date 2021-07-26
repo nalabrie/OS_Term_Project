@@ -37,13 +37,13 @@ re: rclean all
 # rebuild "debug"
 dre: dclean debug
 
-# run "release" (copy the arduino xz file from the 1k block sized vdi to host drive)
+# run "release" (copy the arduino xz file from the 4k block sized vdi to host drive)
 run: re
-	./out/release/$(NAME) ./out/Test-fixed-1k.vdi /arduino-1.6.7-linux64.tar.xz ./out/release/arduino-1.6.7-linux64.tar.xz
+	./out/release/$(NAME) ./out/Test-fixed-4k.vdi /arduino-1.6.7-linux64.tar.xz ./out/release/arduino-1.6.7-linux64.tar.xz
 
-# run "debug" (copy the arduino xz file from the 1k block sized vdi to host drive)
+# run "debug" (copy the arduino xz file from the 4k block sized vdi to host drive)
 drun: dre
-	./out/debug/$(NAME) ./out/Test-fixed-1k.vdi /arduino-1.6.7-linux64.tar.xz ./out/debug/arduino-1.6.7-linux64.tar.xz
+	./out/debug/$(NAME) ./out/Test-fixed-4k.vdi /arduino-1.6.7-linux64.tar.xz ./out/debug/arduino-1.6.7-linux64.tar.xz
 
 # build "debug"
 debug: $(SRC)
@@ -52,4 +52,4 @@ debug: $(SRC)
 # use 7-zip to package the source code for distribution
 package: fclean
 	$(RM) source.zip
-	7z a source.zip . -xr!.* -x!out/Test-fixed-4k.vdi
+	7z a source.zip . -xr!.* -x!out/Test-fixed-1k.vdi
