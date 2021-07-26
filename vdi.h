@@ -56,7 +56,8 @@ class vdi {
 
   // structure of the disk's partitions
   struct partitionEntry {
-    uint32_t status, firstSectorCHS[3], lastSectorCHS[3], type, first_LBA_sector, LBA_sector_count;
+    uint32_t first_LBA_sector, LBA_sector_count;
+    uint8_t status, firstSectorCHS[3], lastSectorCHS[3], type;
   } partitionTable[4];  // partition table is an array of 4 partition entries
 
   // structure of the disk's superblock
@@ -69,7 +70,8 @@ class vdi {
 
   // structure of the disk's block group descriptor table
   struct blockGroupDescriptorTable {
-    uint32_t blockBitmap, inodeBitmap, inodeTable, freeBlocksCount, freeInodesCount, usedDirsCount;
+    uint32_t blockBitmap, inodeBitmap, inodeTable;
+    uint16_t freeBlocksCount, freeInodesCount, usedDirsCount;
   };
 
   // smart pointer to the BGDT array (size dynamically allocated on class construction)
@@ -79,13 +81,15 @@ class vdi {
 
   // structure of the disk's inodes
   struct inode {
-    uint32_t mode, uid, size, atime, ctime, mtime, dtime, gid, linksCount, blocks, flags, block[15], generation,
-        aclBlock;
+    uint32_t size, atime, ctime, mtime, dtime, blocks, flags, block[15], generation, aclBlock;
+    uint16_t mode, uid, gid, linksCount;
   };
 
   // structure of a directory entry
   struct dirEntry {
-    uint32_t iNum, recLen, nameLen, fileType;
+    uint32_t iNum;
+    uint16_t recLen;
+    uint8_t nameLen, fileType;
     char name[256];
   };
 
