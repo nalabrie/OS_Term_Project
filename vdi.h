@@ -7,7 +7,6 @@
 
 #include <cstdint>
 #include <fstream>
-#include <memory>
 
 class vdi {
  private:
@@ -74,10 +73,8 @@ class vdi {
     uint16_t freeBlocksCount, freeInodesCount, usedDirsCount;
   };
 
-  // smart pointer to the BGDT array (size dynamically allocated on class construction)
-  std::unique_ptr<struct blockGroupDescriptorTable[]> blockGroupDescriptorTable;
-
-  // TODO: this ^ usage of a unique pointer is messy, there is probably a better way
+  // pointer to the BGDT array (size dynamically allocated on class construction)
+  blockGroupDescriptorTable *bgdt = NULL;
 
   // structure of the disk's inodes
   struct inode {

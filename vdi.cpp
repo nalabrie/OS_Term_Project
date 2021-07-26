@@ -33,16 +33,22 @@ vdi::vdi(const char *filePath) : filePath(filePath) {
   diskStart = openedPartitionStart;
   partitionClose();
 
-  // fill out the block group descriptor table struct with the opened file
-  blockGroupDescriptorTable = std::make_unique<struct blockGroupDescriptorTable[]>(superblock.blockGroupCount);
-  fetchBGDT(blockGroupDescriptorTable.get(), 1);
+  // fill out the array of "block group descriptor table" structs with the opened file
+  bgdt = new blockGroupDescriptorTable[superblock.blockGroupCount];
+  fetchBGDT(bgdt, 1);
 
-  // TODO: this ^ usage of a unique pointer is messy, there is probably a better way
+  /* TODO:
+   * The pointer "bgdt" will cause a memory leak. This is intentional because this program is meant to do one task very
+   * quickly and then close. If this vdi class is ever extended to be used in another program that has a longer runtime
+   * then "bgdt" needs to be properly deleted when it is no longer needed. Until then, leaving the memory leak in allows
+   * the program to run a bit quicker with no negative side effects. Small popular programs such as GNU's "ls" use this
+   * technique https://lists.gnu.org/archive/html/bug-coreutils/2011-05/msg00065.html
+   */
 
   // reset file cursor
   VDI_file.seekg(0);
 
-  // this is needed or future 'tellg()' calls return -1 and I don't understand why
+  // this is needed or future 'tellg()' calls return -1
   VDI_file.clear();
 }
 
@@ -51,7 +57,7 @@ void vdi::read(char *buffer, std::streamsize size) {
   // forward parameters to the builtin 'fstream' method
   VDI_file.read(buffer, size);
 
-  // this is needed or future 'tellg()' calls return -1 and I don't understand why
+  // this is needed or future 'tellg()' calls return -1
   VDI_file.clear();
 }
 
@@ -61,7 +67,7 @@ void vdi::read(char *buffer, std::streamsize size) {
 //   // forward parameters to the builtin 'fstream' method
 //   VDI_file.write(buffer, size);
 
-//   // this is needed or future 'tellg()' calls return -1 and I don't understand why
+//   // this is needed or future 'tellg()' calls return -1
 //   VDI_file.clear();
 // }
 
@@ -347,7 +353,7 @@ void vdi::partitionRead(char *buffer, std::streamsize size) {
   // read into given buffer
   VDI_file.read(buffer, size);
 
-  // this is needed or future 'tellg()' calls return -1 and I don't understand why
+  // this is needed or future 'tellg()' calls return -1
   VDI_file.clear();
 }
 
@@ -373,7 +379,7 @@ void vdi::partitionRead(char *buffer, std::streamsize size) {
 //   // write buffer to the partition
 //   VDI_file.write(buffer, size);
 
-//   // this is needed or future 'tellg()' calls return -1 and I don't understand why
+//   // this is needed or future 'tellg()' calls return -1
 //   VDI_file.clear();
 // }
 
@@ -857,8 +863,7 @@ void vdi::fetchInode(vdi::inode &in, uint32_t iNum) {
   uint32_t localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
   // move cursor to the start of the desired inode
-  seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeTable - superblock.firstDataBlock) +
-       (localIndex * superblock.inodeSize));
+  seek(locateBlock(bgdt[blockGroup].inodeTable - superblock.firstDataBlock) + (localIndex * superblock.inodeSize));
 
   // temporary buffer for reading in inode values
   char buffer[4];
