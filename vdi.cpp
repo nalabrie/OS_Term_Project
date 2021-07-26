@@ -157,8 +157,9 @@ void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
 //   std::cout.flags(oldFlags);
 // }
 
-// converts the given character buffer from little endian to a single int ('size' = length of buffer)
-int vdi::littleEndianToInt(const char *buffer, int size) {
+// converts the given character buffer from little endian to a single uint64_t ('size' = length of buffer)
+// note: 'size' should never be greater than 8
+uint64_t vdi::littleEndianToInt(const char *buffer, int size) {
   // save existing stringstream settings (to restore later)
   std::ios_base::fmtflags oldFlags(std::stringstream().flags());
 
@@ -166,7 +167,7 @@ int vdi::littleEndianToInt(const char *buffer, int size) {
   std::stringstream ss;
 
   // loop through buffer in reverse
-  for (int i = size - 1; i >= 0; --i) {
+  for (int16_t i = size - 1; i != -1; --i) {
     // concatenate each character in buffer as hex to the stringstream
     ss << std::hex << std::setw(2) << std::setfill('0') << (int)(uint8_t)buffer[i];
   }

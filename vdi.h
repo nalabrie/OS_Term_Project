@@ -50,7 +50,8 @@ class vdi {
 
   // structure of the VDI header
   struct header {
-    uint32_t imageType, offsetBlocks, offsetData, sectorSize, diskSize, blockSize, blocksInHDD, blocksAllocated;
+    uint32_t imageType, offsetBlocks, offsetData, sectorSize, blockSize, blocksInHDD, blocksAllocated;
+    uint64_t diskSize;
   } header;
 
   // structure of the disk's partitions
@@ -128,8 +129,9 @@ class vdi {
   // TODO: unused function, commented out for now
   // static void printBuffer(const char *buffer, uint32_t size);
 
-  // converts the given character buffer from little endian to a single int ('size' = length of buffer)
-  static int littleEndianToInt(const char *buffer, int size);
+  // converts the given character buffer from little endian to a single uint64_t ('size' = length of buffer)
+  // note: 'size' should never be greater than 8
+  static uint64_t littleEndianToInt(const char *buffer, int size);
 
   // converts an int to a hex in little endian format and places the result into a character buffer
   // (buffer size of 4 will hold the full int, less than 4 will truncate)
