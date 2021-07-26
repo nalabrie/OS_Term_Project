@@ -93,19 +93,19 @@ void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
 
 // prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
 // TODO: unused function, commented out for now
-// void vdi::printBuffer(const char *buffer, unsigned int size) {
+// void vdi::printBuffer(const char *buffer, uint32_t size) {
 //   // save existing cout settings (to restore later)
 //   std::ios_base::fmtflags oldFlags(std::cout.flags());
 
 //   // loop through entire 'buffer'
-//   for (unsigned int i = 0; i < size; ++i) {
+//   for (uint32_t i = 0; i < size; ++i) {
 //     // condition is true every 16 loops
 //     if (i % 16 == 0 && i != 0) {
 //       // move 4 spaces away from hex block
 //       std::cout << "   ";
 
 //       // loop through the previous 16 again
-//       for (unsigned int j = i - 16; j < i; ++j) {
+//       for (uint32_t j = i - 16; j < i; ++j) {
 //         if ((int)buffer[j] >= 32 && (int)buffer[j] <= 126) {
 //           // only print readable characters
 //           std::cout << buffer[j];
@@ -130,7 +130,7 @@ void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
 
 //   // if the final hex line is not a full line
 //   if (size % 16 != 0) {
-//     for (unsigned int i = 0; i < (16 - (size % 16)) * 3; ++i) {
+//     for (uint32_t i = 0; i < (16 - (size % 16)) * 3; ++i) {
 //       // fill the remaining area with spaces
 //       std::cout << " ";
 //     }
@@ -140,7 +140,7 @@ void vdi::seek(std::ios::off_type offset, std::ios_base::seekdir direction) {
 //   std::cout << "   ";
 
 //   // loop through the remainder of the buffer to print the final line of text
-//   for (unsigned int i = size - (size - (size % 16) == size ? 16 : size % 16); i < size; ++i) {
+//   for (uint32_t i = size - (size - (size % 16) == size ? 16 : size % 16); i < size; ++i) {
 //     if ((int)buffer[i] >= 32 && (int)buffer[i] <= 126) {
 //       // only print readable characters
 //       std::cout << buffer[i];
@@ -184,7 +184,7 @@ int vdi::littleEndianToInt(const char *buffer, int size) {
 // converts an int to a hex in little endian format and places the result into a character buffer
 // (buffer size of 4 will hold the full int, less than 4 will truncate)
 // TODO: unused function, commented out for now
-// void vdi::intToLittleEndianHex(char *buffer, unsigned int bufferSize, unsigned int num) {
+// void vdi::intToLittleEndianHex(char *buffer, uint32_t bufferSize, uint32_t num) {
 //   // check that the buffer size is between 1 and 4
 //   if (bufferSize < 1 || bufferSize > 4) {
 //     throw std::invalid_argument("buffer size must be between 1 and 4");
@@ -404,7 +404,7 @@ void vdi::partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direct
   }
 
   // position to be moved to (after calculations)
-  unsigned int position = 0;
+  uint32_t position = 0;
 
   // check that the desired position is within the bounds of the opened partition
   switch (direction) {
@@ -520,7 +520,7 @@ void vdi::setSuperblock() {
   superblock.inodeSize = littleEndianToInt(buffer, 2);
 
   // get block size
-  superblock.blockSize = (unsigned int)1024 << superblock.logBlockSize;
+  superblock.blockSize = (uint32_t)1024 << superblock.logBlockSize;
 
   // get block group count
   superblock.blockGroupCount = ceil((double)superblock.blockCount / (double)superblock.blocksPerGroup);
@@ -530,12 +530,12 @@ void vdi::setSuperblock() {
 }
 
 // get the VDI file's byte location of the desired block number
-unsigned int vdi::locateBlock(unsigned int blockNum) const {
+uint32_t vdi::locateBlock(uint32_t blockNum) const {
   return (blockNum * superblock.blockSize) + (superblock.firstDataBlock * superblock.blockSize);
 }
 
 // read the block indicated by 'blockNum' into the buffer (buffer must be at least size 'superblock.blockSize')
-void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
+void vdi::fetchBlock(char *buffer, uint32_t blockNum) {
   // set file cursor to the start of the desired block
   seek(locateBlock(blockNum));
 
@@ -546,7 +546,7 @@ void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
 // write the contents of the buffer into the block indicated by 'blockNum'
 // (buffer cannot be bigger than 'superblock.blockSize')
 // TODO: unused function, commented out for now
-// void vdi::writeBlock(const char *buffer, unsigned int blockNum) {
+// void vdi::writeBlock(const char *buffer, uint32_t blockNum) {
 //   // set file cursor to the start of the desired block
 //   seek(locateBlock(blockNum));
 
@@ -555,12 +555,12 @@ void vdi::fetchBlock(char *buffer, unsigned int blockNum) {
 // }
 
 // read the superblock into the supplied structure at the specified block number
-void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
+void vdi::fetchSuperblock(struct vdi::superblock &sb, uint32_t blockNum) {
   // temporary buffer for reading in superblock values
   char buffer[4];
 
   // calculate the start of the desired block
-  unsigned int blockStart = locateBlock(blockNum);
+  uint32_t blockStart = locateBlock(blockNum);
   if (blockNum == 0 && superblock.firstDataBlock == 0) {
     // attempting to get main superblock of non-1kb system
     // move block start another kb to reach superblock start
@@ -644,7 +644,7 @@ void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
   sb.inodeSize = littleEndianToInt(buffer, 2);
 
   // get block size
-  sb.blockSize = (unsigned int)1024 << sb.logBlockSize;
+  sb.blockSize = (uint32_t)1024 << sb.logBlockSize;
 
   // get block group count
   sb.blockGroupCount = ceil((double)sb.blockCount / (double)sb.blocksPerGroup);
@@ -652,7 +652,7 @@ void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
 
 // write the supplied superblock structure into the superblock at the specified block number
 // TODO: unused function, commented out for now
-// void vdi::writeSuperblock(const struct vdi::superblock &sb, unsigned int blockNum) {
+// void vdi::writeSuperblock(const struct vdi::superblock &sb, uint32_t blockNum) {
 //   // try fetching the superblock to check that a superblock already exists at this block number
 //   try {
 //     struct superblock temp {};
@@ -663,7 +663,7 @@ void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
 //   }
 
 //   // calculate the start of the desired block
-//   unsigned int blockStart = locateBlock(blockNum);
+//   uint32_t blockStart = locateBlock(blockNum);
 //   if (blockNum == 0 && superblock.firstDataBlock == 0) {
 //     // attempting to get main superblock of non-1kb system
 //     // move block start another kb to reach superblock start
@@ -740,7 +740,7 @@ void vdi::fetchSuperblock(struct vdi::superblock &sb, unsigned int blockNum) {
 // }
 
 // read the block group descriptor table into the supplied structure at the specified block number
-void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
+void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, uint32_t blockNum) {
   // check that the user is attempting to fetch a valid BGDT (try fetching the superblock at 'blockNum' - 1)
   try {
     struct superblock temp {};
@@ -753,13 +753,13 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int bl
   char buffer[4];
 
   // calculate the start of the desired block
-  unsigned int blockStart = locateBlock(blockNum);
+  uint32_t blockStart = locateBlock(blockNum);
 
   // move cursor to the start of the block
   seek(blockStart);
 
   // loop through each row of the table
-  for (unsigned int i = 0; i < superblock.blockGroupCount; ++i) {
+  for (uint32_t i = 0; i < superblock.blockGroupCount; ++i) {
     // get block bitmap
     read(buffer, 4);
     bgdt[i].blockBitmap = littleEndianToInt(buffer, 4);
@@ -792,7 +792,7 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int bl
 // write the supplied block group descriptor table structure into the block group descriptor table
 // at the specified block number
 // TODO: unused function, commented out for now
-// void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, unsigned int blockNum) {
+// void vdi::writeBGDT(const struct vdi::blockGroupDescriptorTable *bgdt, uint32_t blockNum) {
 //   // check that the user is attempting to write to a valid BGDT (try fetching the superblock at 'blockNum' - 1)
 //   try {
 //     struct superblock temp {};
@@ -806,13 +806,13 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int bl
 //   char buffer[4];
 
 //   // calculate the start of the desired block
-//   unsigned int blockStart = locateBlock(blockNum);
+//   uint32_t blockStart = locateBlock(blockNum);
 
 //   // move cursor back to the start of the block
 //   seek(blockStart);
 
 //   // loop through each row of the table
-//   for (unsigned int i = 0; i < superblock.blockGroupCount; ++i) {
+//   for (uint32_t i = 0; i < superblock.blockGroupCount; ++i) {
 //     // get block bitmap
 //     intToLittleEndianHex(buffer, 4, bgdt[i].blockBitmap);
 //     write(buffer, 4);
@@ -843,17 +843,17 @@ void vdi::fetchBGDT(struct vdi::blockGroupDescriptorTable *bgdt, unsigned int bl
 // }
 
 // read the inode at the specified inode index into an inode structure
-void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
+void vdi::fetchInode(vdi::inode &in, uint32_t iNum) {
   // error checking
   if (iNum == 0) {
     throw std::invalid_argument("cannot fetch inode, inode number cannot be zero");
   }
 
   // calculate block group that the inode belongs to
-  unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
+  uint32_t blockGroup = (iNum - 1) / superblock.inodesPerGroup;
 
   // calculate local inode index within that block group
-  unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+  uint32_t localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
   // move cursor to the start of the desired inode
   seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeTable - superblock.firstDataBlock) +
@@ -910,7 +910,7 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
   // get the block array (15 4-byte values)
   seek(4, std::ios::cur);
-  for (unsigned int &i : in.block) {
+  for (uint32_t &i : in.block) {
     read(buffer, 4);
     i = littleEndianToInt(buffer, 4);
   }
@@ -926,17 +926,17 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
 // write the given inode structure at the specified inode index
 // TODO: unused function, commented out for now
-// void vdi::writeInode(const vdi::inode &in, unsigned int iNum) {
+// void vdi::writeInode(const vdi::inode &in, uint32_t iNum) {
 //   // error checking
 //   if (iNum == 0) {
 //     throw std::invalid_argument("cannot write inode, inode number cannot be zero");
 //   }
 
 //   // calculate block group that the inode belongs to
-//   unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
+//   uint32_t blockGroup = (iNum - 1) / superblock.inodesPerGroup;
 
 //   // calculate local inode index within that block group
-//   unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+//   uint32_t localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
 //   // move cursor to the start of the desired inode
 //   seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeTable - superblock.firstDataBlock) +
@@ -991,7 +991,7 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
 //   // write the block array (15 4-byte values)
 //   seek(4, std::ios::cur);
-//   for (unsigned int i : in.block) {
+//   for (uint32_t i : in.block) {
 //     intToLittleEndianHex(buffer, 4, i);
 //     write(buffer, 4);
 //   }
@@ -1007,23 +1007,23 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
 // checks if an inode is in use (true = in use)
 // TODO: unused function, commented out for now
-// bool vdi::inodeInUse(unsigned int iNum) {
+// bool vdi::inodeInUse(uint32_t iNum) {
 //   // error checking
 //   if (iNum == 0) {
 //     throw std::invalid_argument("cannot check if inode is in use, inode number cannot be zero");
 //   }
 
 //   // calculate block group that the inode belongs to
-//   unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
+//   uint32_t blockGroup = (iNum - 1) / superblock.inodesPerGroup;
 
 //   // calculate local inode index within that block group
-//   unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+//   uint32_t localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
 //   // move file cursor to the start of the inode bitmap block for that group
 //   seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap - superblock.firstDataBlock));
 
 //   // calculate which byte the desired bit is contained in
-//   unsigned int byteOffset = localIndex / 8;
+//   uint32_t byteOffset = localIndex / 8;
 
 //   // move cursor that many bytes forward
 //   seek(byteOffset, std::ios::cur);
@@ -1038,7 +1038,7 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 //   std::bitset<8> binary(byte);
 
 //   // calculate the correct bit index of the byte
-//   unsigned int bitOffset = localIndex % 8;
+//   uint32_t bitOffset = localIndex % 8;
 
 //   // return the bit
 //   return binary[bitOffset];
@@ -1047,7 +1047,7 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 // allocate any free inode in the given group and return its inode number (group = -1 means pick any group)
 // note: a return value of -1 means an unknown error occurred
 // TODO: unused function, commented out for now
-// unsigned int vdi::allocateInode(int group) {
+// uint32_t vdi::allocateInode(int group) {
 //   // error checking
 //   if (group > (int)(superblock.blockGroupCount - 1)) {
 //     throw std::range_error("cannot allocate inode, desired group is larger than available groups");
@@ -1058,15 +1058,15 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 //   }
 
 //   // inode number (assigned in the following if/else)
-//   unsigned int iNum = -1;
-//   // TODO: Who is the idiot that assigned -1 to an unsigned int? Oh yeah, it was me. Not sure what the correct fix is
+//   uint32_t iNum = -1;
+//   // TODO: Who is the idiot that assigned -1 to an uint32_t? Oh yeah, it was me. Not sure what the correct fix is
 //   // at the moment, come back to this later.
 
 //   if (group == -1) {
 //     /* pick any group */
 
 //     // for-loop that runs for the amount of block groups
-//     for (unsigned int i = 0; i < superblock.blockGroupCount; ++i) {
+//     for (uint32_t i = 0; i < superblock.blockGroupCount; ++i) {
 //       try {
 //         // attempt allocating an inode at the current value of 'i' and save the resulting inode number
 //         iNum = allocateInode(i);
@@ -1091,7 +1091,7 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
 //     // loop through inodes within that group until a free one is found
 //     bool found = false;
-//     for (unsigned int i = 0; i < superblock.inodesPerGroup; ++i) {
+//     for (uint32_t i = 0; i < superblock.inodesPerGroup; ++i) {
 //       if (!inodeInUse(iNum)) {
 //         found = true;
 //         break;
@@ -1108,13 +1108,13 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 //     /* ready to allocate inode at this point */
 
 //     // calculate local inode index within the given block group
-//     unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+//     uint32_t localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
 //     // move file cursor to the start of the inode bitmap block for the given group
 //     seek(locateBlock(blockGroupDescriptorTable[group].inodeBitmap - superblock.firstDataBlock));
 
 //     // calculate which byte the desired bit is contained in
-//     unsigned int byteOffset = localIndex / 8;
+//     uint32_t byteOffset = localIndex / 8;
 
 //     // move cursor that many bytes forward
 //     seek(byteOffset, std::ios::cur);
@@ -1129,7 +1129,7 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 //     std::bitset<8> binary(byte);
 
 //     // calculate the correct bit index of the byte
-//     unsigned int bitOffset = localIndex % 8;
+//     uint32_t bitOffset = localIndex % 8;
 
 //     // set the bit to 1
 //     binary[bitOffset] = true;
@@ -1150,23 +1150,23 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
 // mark the given inode as free
 // TODO: unused function, commented out for now
-// void vdi::freeInode(unsigned int iNum) {
+// void vdi::freeInode(uint32_t iNum) {
 //   // error checking
 //   if (iNum == 0) {
 //     throw std::invalid_argument("cannot free inode, inode number cannot be zero");
 //   }
 
 //   // calculate block group that the inode belongs to
-//   unsigned int blockGroup = (iNum - 1) / superblock.inodesPerGroup;
+//   uint32_t blockGroup = (iNum - 1) / superblock.inodesPerGroup;
 
 //   // calculate local inode index within that block group
-//   unsigned int localIndex = (iNum - 1) % superblock.inodesPerGroup;
+//   uint32_t localIndex = (iNum - 1) % superblock.inodesPerGroup;
 
 //   // move file cursor to the start of the inode bitmap block for that group
 //   seek(locateBlock(blockGroupDescriptorTable[blockGroup].inodeBitmap - superblock.firstDataBlock));
 
 //   // calculate which byte the desired bit is contained in
-//   unsigned int byteOffset = localIndex / 8;
+//   uint32_t byteOffset = localIndex / 8;
 
 //   // move cursor that many bytes forward
 //   seek(byteOffset, std::ios::cur);
@@ -1181,7 +1181,7 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 //   std::bitset<8> binary(byte);
 
 //   // calculate the correct bit index of the byte
-//   unsigned int bitOffset = localIndex % 8;
+//   uint32_t bitOffset = localIndex % 8;
 
 //   // set the bit to 0
 //   binary[bitOffset] = false;
@@ -1198,13 +1198,13 @@ void vdi::fetchInode(vdi::inode &in, unsigned int iNum) {
 
 // read the file block 'bNum' into a buffer of the file represented by the supplied inode
 // (buffer must be at least size 'superblock.blockSize')
-void vdi::fetchBlockFromFile(char *buffer, const vdi::inode &in, unsigned int bNum) {
+void vdi::fetchBlockFromFile(char *buffer, const vdi::inode &in, uint32_t bNum) {
   // array length of the inode indirect blocks
-  unsigned int k = superblock.blockSize / 4;
+  uint32_t k = superblock.blockSize / 4;
 
   // the disk block number that contains the file data block being requested
   // (calculated in the following if/else)
-  unsigned int diskBlock;
+  uint32_t diskBlock;
 
   if (bNum < 12) {
     /* data block is stored in the inode block array */
@@ -1249,7 +1249,7 @@ void vdi::fetchBlockFromFile(char *buffer, const vdi::inode &in, unsigned int bN
     bNum = bNum - 12 - k;
 
     // get the index of the correct SIB
-    unsigned int SIB_index = bNum / k;
+    uint32_t SIB_index = bNum / k;
 
     // move file cursor to that SIB
     seek(SIB_index * 4, std::ios::cur);
@@ -1288,7 +1288,7 @@ void vdi::fetchBlockFromFile(char *buffer, const vdi::inode &in, unsigned int bN
     bNum = bNum - 12 - k - k * k;
 
     // get the index of the correct TIB
-    unsigned int TIB_index = bNum / (k * k);
+    uint32_t TIB_index = bNum / (k * k);
 
     // move file cursor to that TIB
     seek(TIB_index * 4, std::ios::cur);
@@ -1304,7 +1304,7 @@ void vdi::fetchBlockFromFile(char *buffer, const vdi::inode &in, unsigned int bN
     seek(locateBlock(diskBlock - superblock.firstDataBlock));
 
     // get the index of the correct SIB
-    unsigned int SIB_index = bNum / k;
+    uint32_t SIB_index = bNum / k;
 
     // move file cursor to that SIB
     seek(SIB_index * 4, std::ios::cur);
@@ -1336,10 +1336,10 @@ void vdi::fetchBlockFromFile(char *buffer, const vdi::inode &in, unsigned int bN
 // write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
 // (buffer must be at least size 'superblock.blockSize')
 // TODO: not implemented, come back to this at the end if there is enough time
-// void vdi::writeBlockToFile(const char *buffer, vdi::inode &in, unsigned int bNum) {}
+// void vdi::writeBlockToFile(const char *buffer, vdi::inode &in, uint32_t bNum) {}
 
 // open the directory with the given inode number and return a pointer to the directory struct
-vdi::directory *vdi::openDir(unsigned int iNum) {
+vdi::directory *vdi::openDir(uint32_t iNum) {
   // create new directory pointer
   auto *d = new directory;
 
@@ -1355,14 +1355,14 @@ vdi::directory *vdi::openDir(unsigned int iNum) {
 // fetch the next directory entry inside the given directory
 // fill the inode number and name of the entry into 'iNum' and 'name'
 // returns true on success, false if it hit the end of the directory
-bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
+bool vdi::getNextDirEntry(vdi::directory *d, uint32_t &iNum, char *name) {
   // only run if there is another entry in the given directory
   if (d->cursor < d->in.size) {
     // calculate block number
-    unsigned int blockNum = d->cursor / superblock.blockSize;
+    uint32_t blockNum = d->cursor / superblock.blockSize;
 
     // get offset with the block
-    unsigned int offset = d->cursor - (blockNum * superblock.blockSize);
+    uint32_t offset = d->cursor - (blockNum * superblock.blockSize);
 
     // fetch the block
     fetchBlockFromFile(d->block, d->in, blockNum);
@@ -1391,7 +1391,7 @@ bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
       buffer[i] = d->block[offset++];
     }
     d->entry.fileType = littleEndianToInt(buffer, 1);  // assign fileType
-    for (unsigned int i = 0; i < d->entry.nameLen; ++i) {
+    for (uint32_t i = 0; i < d->entry.nameLen; ++i) {
       d->entry.name[i] = d->block[offset++];  // assign name
     }
 
@@ -1403,7 +1403,7 @@ bool vdi::getNextDirEntry(vdi::directory *d, unsigned int &iNum, char *name) {
 
     // fill out supplied 'iNum' and 'name'
     iNum = d->entry.iNum;
-    for (unsigned int i = 0; i < d->entry.nameLen; ++i) {
+    for (uint32_t i = 0; i < d->entry.nameLen; ++i) {
       name[i] = d->entry.name[i];
     }
     name[d->entry.nameLen] = '\0';
@@ -1428,7 +1428,7 @@ void vdi::closeDir(vdi::directory *d) {
 
 // searches a directory with inode 'iNum' for the target file 'target' and returns the inode number of the file
 // note: returns 0 if a file is not found
-unsigned int vdi::searchDir(unsigned int iNum, char *target) {
+uint32_t vdi::searchDir(uint32_t iNum, char *target) {
   // open the directory at inode number 'iNum'
   directory *d = openDir(iNum);
 
@@ -1452,21 +1452,21 @@ unsigned int vdi::searchDir(unsigned int iNum, char *target) {
 }
 
 // takes a full file path and returns the inode number of the file
-unsigned int vdi::traversePath(char *path) {
+uint32_t vdi::traversePath(char *path) {
   // used in the following while-loop as an index for 'path' array
-  unsigned int start = 1;
+  uint32_t start = 1;
 
   // length of the path string
-  unsigned int len = strlen(path);
+  uint32_t len = strlen(path);
 
   // inode number to be returned
-  unsigned int iNum = 2;
+  uint32_t iNum = 2;
 
   // loop until the path has been fully processed to the end or the file was not found (iNum == 0)
   while (start < len && iNum != 0) {
     // loop through path to find the location of the next '/'
-    unsigned int end = 0;
-    for (unsigned int i = 1; i < len; ++i) {
+    uint32_t end = 0;
+    for (uint32_t i = 1; i < len; ++i) {
       if (path[i] == '/') {
         // store index of found '/' and stop looping
         end = i;
@@ -1518,7 +1518,7 @@ void vdi::printFileInfo(vdi::directory *d) {
   std::string octalPermissionsString = octalPermissions.str();
 
   // convert each permission value to integers
-  unsigned int user, group, other;
+  uint32_t user, group, other;
   other = octalPermissionsString[octalPermissionsString.length() - 1] - '0';
   group = octalPermissionsString[octalPermissionsString.length() - 2] - '0';
   user = octalPermissionsString[octalPermissionsString.length() - 3] - '0';
@@ -1619,12 +1619,12 @@ void vdi::printFileInfo(vdi::directory *d) {
 
   // print file/folder info
   std::cout << permissions << ' ' << i.linksCount << '\t' << i.uid << '\t' << i.gid << '\t' << i.size << "      \t"
-            << mtime_string << '\t' << d->entry.name << std::endl;
+            << mtime_string << '\t' << d->entry.name << '\n';
 }
 
 // prints all files and directories inside the VDI file starting at inode 'iNum' and goes to the end of the disk
 // note: iNum of 2 lists all files/folders inside the VDI file
-void vdi::printAllFiles(unsigned int iNum) {
+void vdi::printAllFiles(uint32_t iNum) {
   // open the directory at inode 'iNum'
   directory *d = openDir(iNum);
 

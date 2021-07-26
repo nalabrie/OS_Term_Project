@@ -21,23 +21,23 @@ int main(int argc, char **argv) {
   std::cout << "copying file \"" << argv[2] << "\" from VDI to host system as \"" << argv[3] << "\"\n";
 
   // get inode number of desired file
-  unsigned int iNum = file.traversePath(argv[2]);
+  uint32_t iNum = file.traversePath(argv[2]);
 
   // get inode
   vdi::inode in{};
   file.fetchInode(in, iNum);
 
   // calculate how many blocks the file takes up
-  unsigned int blockCount = in.size / file.superblock.blockSize + 1;
+  uint32_t blockCount = in.size / file.superblock.blockSize + 1;
 
   // calculate the remaining number of bytes in the final block
-  unsigned int remainder = in.size % file.superblock.blockSize;
+  uint32_t remainder = in.size % file.superblock.blockSize;
 
   // buffer for holding each block of data
   char buffer[file.superblock.blockSize];
 
   // loop through the file block by block
-  for (unsigned int i = 0; i < blockCount; ++i) {
+  for (uint32_t i = 0; i < blockCount; ++i) {
     // read current block into buffer
     file.fetchBlockFromFile(buffer, in, i);
 
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
    * refactor in 2021 but I'm leaving them here just in case they are useful again someday
    */
 
-  //    static const unsigned int size = file.superblock.blockSize;
+  //    static const uint32_t size = file.superblock.blockSize;
   //    char buffer[size];
 
   //    file.seek(file.header.offsetData + 0x1be);  // partition table
@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
   // directory access tests
 
   //    char name[256];
-  //    unsigned int iNum;
+  //    uint32_t iNum;
   //    vdi::directory *d;
   //
   //    d = file.openDir(2);

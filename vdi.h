@@ -5,6 +5,7 @@
 #ifndef OS_TERM_PROJECT_VDI_H
 #define OS_TERM_PROJECT_VDI_H
 
+#include <cstdint>
 #include <fstream>
 #include <memory>
 
@@ -16,19 +17,19 @@ class vdi {
   std::fstream VDI_file;
 
   // size of the VDI file (0 = file not opened)
-  unsigned int fileSize = 0;
+  uint32_t fileSize = 0;
 
   // the starting location of the VDI's disk (0 = not yet set)
-  unsigned int diskStart = 0;
+  uint32_t diskStart = 0;
 
   // the currently opened partition number (0 = no opened partition)
   int openedPartition = 0;
 
   // the currently opened partition start (0 = no opened partition)
-  unsigned int openedPartitionStart = 0;
+  uint32_t openedPartitionStart = 0;
 
   // the currently opened partition end (0 = no opened partition)
-  unsigned int openedPartitionEnd = 0;
+  uint32_t openedPartitionEnd = 0;
 
   /* METHODS */
 
@@ -42,31 +43,32 @@ class vdi {
   void setSuperblock();
 
   // get the VDI file's byte location of the desired block number
-  unsigned int locateBlock(unsigned int blockNum) const;
+  uint32_t locateBlock(uint32_t blockNum) const;
 
  public:
   /* VARIABLES */
 
   // structure of the VDI header
   struct header {
-    unsigned int imageType, offsetBlocks, offsetData, sectorSize, diskSize, blockSize, blocksInHDD, blocksAllocated;
+    uint32_t imageType, offsetBlocks, offsetData, sectorSize, diskSize, blockSize, blocksInHDD, blocksAllocated;
   } header;
 
   // structure of the disk's partitions
   struct partitionEntry {
-    unsigned int status, firstSectorCHS[3], lastSectorCHS[3], type, first_LBA_sector, LBA_sector_count;
+    uint32_t status, firstSectorCHS[3], lastSectorCHS[3], type, first_LBA_sector, LBA_sector_count;
   } partitionTable[4];  // partition table is an array of 4 partition entries
 
   // structure of the disk's superblock
   struct superblock {
-    unsigned int inodeCount, blockCount, reservedBlockCount, freeBlockCount, freeInodeCount, firstDataBlock,
-        logBlockSize, logFragmentSize, blocksPerGroup, fragmentsPerGroup, inodesPerGroup, magicNumber, state,
-        firstInodeNumber, inodeSize, blockSize, blockGroupCount;
+    uint32_t inodeCount, blockCount, reservedBlockCount, freeBlockCount, freeInodeCount, firstDataBlock, logBlockSize,
+        logFragmentSize, blocksPerGroup, fragmentsPerGroup, inodesPerGroup, firstInodeNumber, blockSize,
+        blockGroupCount;
+    uint16_t magicNumber, state, inodeSize;
   } superblock;
 
   // structure of the disk's block group descriptor table
   struct blockGroupDescriptorTable {
-    unsigned int blockBitmap, inodeBitmap, inodeTable, freeBlocksCount, freeInodesCount, usedDirsCount;
+    uint32_t blockBitmap, inodeBitmap, inodeTable, freeBlocksCount, freeInodesCount, usedDirsCount;
   };
 
   // smart pointer to the BGDT array (size dynamically allocated on class construction)
@@ -76,13 +78,13 @@ class vdi {
 
   // structure of the disk's inodes
   struct inode {
-    unsigned int mode, uid, size, atime, ctime, mtime, dtime, gid, linksCount, blocks, flags, block[15], generation,
+    uint32_t mode, uid, size, atime, ctime, mtime, dtime, gid, linksCount, blocks, flags, block[15], generation,
         aclBlock;
   };
 
   // structure of a directory entry
   struct dirEntry {
-    unsigned int iNum, recLen, nameLen, fileType;
+    uint32_t iNum, recLen, nameLen, fileType;
     char name[256];
   };
 
@@ -90,7 +92,7 @@ class vdi {
   struct directory {
     inode in;
     dirEntry entry;
-    unsigned int iNum, cursor = 0;
+    uint32_t iNum, cursor = 0;
     char *block;
   };
 
@@ -124,7 +126,7 @@ class vdi {
 
   // prints the given buffer in both hexadecimal and characters ('size' = length of buffer)
   // TODO: unused function, commented out for now
-  // static void printBuffer(const char *buffer, unsigned int size);
+  // static void printBuffer(const char *buffer, uint32_t size);
 
   // converts the given character buffer from little endian to a single int ('size' = length of buffer)
   static int littleEndianToInt(const char *buffer, int size);
@@ -132,7 +134,7 @@ class vdi {
   // converts an int to a hex in little endian format and places the result into a character buffer
   // (buffer size of 4 will hold the full int, less than 4 will truncate)
   // TODO: unused function, commented out for now
-  // static void intToLittleEndianHex(char *buffer, unsigned int bufferSize, unsigned int num);
+  // static void intToLittleEndianHex(char *buffer, uint32_t bufferSize, uint32_t num);
 
   // open a partition by its number (1-4)
   void partitionOpen(int number);
@@ -155,62 +157,62 @@ class vdi {
   void partitionSeek(std::ios::off_type offset, std::ios_base::seekdir direction);
 
   // read the block indicated by 'blockNum' into the buffer (buffer must be at least size 'superblock.blockSize')
-  void fetchBlock(char *buffer, unsigned int blockNum);
+  void fetchBlock(char *buffer, uint32_t blockNum);
 
   // write the contents of the buffer into the block indicated by 'blockNum'
   // (buffer cannot be bigger than 'superblock.blockSize')
   // TODO: unused function, commented out for now
-  // void writeBlock(const char *buffer, unsigned int blockNum);
+  // void writeBlock(const char *buffer, uint32_t blockNum);
 
   // read the superblock into the supplied structure at the specified block number
-  void fetchSuperblock(struct superblock &sb, unsigned int blockNum);
+  void fetchSuperblock(struct superblock &sb, uint32_t blockNum);
 
   // write the supplied superblock structure into the superblock at the specified block number
   // TODO: unused function, commented out for now
-  // void writeSuperblock(const struct superblock &sb, unsigned int blockNum);
+  // void writeSuperblock(const struct superblock &sb, uint32_t blockNum);
 
   // read the block group descriptor table into the supplied structure at the specified block number
-  void fetchBGDT(struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
+  void fetchBGDT(struct blockGroupDescriptorTable *bgdt, uint32_t blockNum);
 
   // write the supplied block group descriptor table structure into the block group descriptor table
   // at the specified block number
-  // void writeBGDT(const struct blockGroupDescriptorTable *bgdt, unsigned int blockNum);
+  // void writeBGDT(const struct blockGroupDescriptorTable *bgdt, uint32_t blockNum);
 
   // read the inode at the specified inode index into an inode structure
-  void fetchInode(struct inode &in, unsigned int iNum);
+  void fetchInode(struct inode &in, uint32_t iNum);
 
   // write the given inode structure at the specified inode index
   // TODO: unused function, commented out for now
-  // void writeInode(const struct inode &in, unsigned int iNum);
+  // void writeInode(const struct inode &in, uint32_t iNum);
 
   // checks if an inode is in use (true = in use)
   // TODO: unused function, commented out for now
-  // bool inodeInUse(unsigned int iNum);
+  // bool inodeInUse(uint32_t iNum);
 
   // allocate any free inode in the given group and return its inode number (group = -1 means pick any group)
   // TODO: unused function, commented out for now
-  // unsigned int allocateInode(int group);
+  // uint32_t allocateInode(int group);
 
   // mark the given inode as free
   // TODO: unused function, commented out for now
-  // void freeInode(unsigned int iNum);
+  // void freeInode(uint32_t iNum);
 
   // read the file block 'bNum' into a buffer of the file represented by the supplied inode
   // (buffer must be at least size 'superblock.blockSize')
-  void fetchBlockFromFile(char *buffer, const struct inode &in, unsigned int bNum);
+  void fetchBlockFromFile(char *buffer, const struct inode &in, uint32_t bNum);
 
   // write the supplied buffer into the file block 'bNum' of the file represented by the supplied inode
   // (buffer must be at least size 'superblock.blockSize')
   // TODO: unused function, commented out for now
-  // void writeBlockToFile(const char *buffer, struct inode &in, unsigned int bNum);
+  // void writeBlockToFile(const char *buffer, struct inode &in, uint32_t bNum);
 
   // open the directory with the given inode number and return a pointer to the directory struct
-  struct directory *openDir(unsigned int iNum);
+  struct directory *openDir(uint32_t iNum);
 
   // fetch the next directory entry inside the given directory
   // fill the inode number and name of the entry into 'iNum' and 'name'
   // returns true on success, false if it hit the end of the directory
-  bool getNextDirEntry(struct directory *d, unsigned int &iNum, char *name);
+  bool getNextDirEntry(struct directory *d, uint32_t &iNum, char *name);
 
   // reset the directory cursor to 0
   // TODO: unused function, commented out for now
@@ -221,17 +223,17 @@ class vdi {
 
   // searches a directory with inode 'iNum' for the target file 'target' and returns the inode number of the file
   // note: returns 0 if a file is not found
-  unsigned int searchDir(unsigned int iNum, char *target);
+  uint32_t searchDir(uint32_t iNum, char *target);
 
   // takes a full file path and returns the inode number of the file
-  unsigned int traversePath(char *path);
+  uint32_t traversePath(char *path);
 
   // print the info of a file at the current 'directory entry' stored in directory 'd'
   void printFileInfo(struct directory *d);
 
   // prints all files and directories inside the VDI file starting at inode 'iNum' and goes to the end of the disk
   // note: iNum of 2 lists all files/folders inside the VDI file
-  void printAllFiles(unsigned int iNum);
+  void printAllFiles(uint32_t iNum);
 };
 
 #endif  // OS_TERM_PROJECT_VDI_H
