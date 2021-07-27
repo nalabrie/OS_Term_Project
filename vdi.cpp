@@ -1631,6 +1631,8 @@ void vdi::printFileInfo(vdi::directory *d) {
 // prints all files and directories inside the VDI file starting at inode 'iNum' and goes to the end of the disk
 // note: iNum of 2 lists all files/folders inside the VDI file
 void vdi::printAllFiles(uint32_t iNum) {
+  // TODO: print the file's full path and not just the file name
+
   // open the directory at inode 'iNum'
   directory *d = openDir(iNum);
 

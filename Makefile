@@ -1,7 +1,7 @@
 NAME=VDI_file_extractor
 
-CC=g++-10
-STD=-std=c++17
+CC=g++
+STD=-std=c++14
 FLAGS=-O2 -s -march=native -DNDEBUG
 DEBUG_FLAGS=-Wall -Wextra -g -fsanitize=address
 SRC=*.cpp
