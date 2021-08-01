@@ -171,24 +171,9 @@ uint64_t vdi::littleEndianToInt(const char *buffer, uint8_t size) {
     throw std::invalid_argument("'size' should never be greater than 8");
   }
 
-  // save existing stringstream settings (to restore later)
-  std::ios_base::fmtflags oldFlags(std::stringstream().flags());
-
-  // stringstream to store buffer in reverse order
-  std::stringstream ss;
-
-  // loop through buffer in reverse
-  for (int8_t i = size - 1; i != -1; --i) {
-    // concatenate each character in buffer as hex to the stringstream
-    ss << std::hex << std::setw(2) << std::setfill('0') << (int)(uint8_t)buffer[i];
-  }
-
-  // store resulting stringstream as int
-  int result;
-  ss >> result;
-
-  // restore stringstream settings
-  std::stringstream().flags(oldFlags);
+  // copy the buffer memory into a 64-bit int
+  uint64_t result;
+  memcpy(&result, buffer, size);
 
   return result;
 }
