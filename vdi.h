@@ -132,7 +132,7 @@ class vdi {
 
   // converts the given character buffer from little endian to a single uint64_t ('size' = length of buffer)
   // note: 'size' should never be greater than 8
-  static uint64_t littleEndianToInt(const char *buffer, int size);
+  static uint64_t littleEndianToInt(const char *buffer, uint8_t size);
 
   // converts an int to a hex in little endian format and places the result into a character buffer
   // (buffer size of 4 will hold the full int, less than 4 will truncate)
